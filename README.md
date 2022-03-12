@@ -2,7 +2,7 @@
 DEY-AIO stands for Digi Embedded Yocto All In One.
 It contain docker-compose file and also some scripts to help you pack and publish your DEY images.
 
-**[[中文说明]](README.md)**
+**[[中文说明]](README-cn.md)**
 
 ## 1. Feature
 1. Completely open source.
@@ -56,7 +56,7 @@ docker-compose up
 ```
 Wait till everything is ready and use ctrl+c to exit. Now workspace folder have been generated. You need to give this folder full read/write priviledge so that containers can work as expected.
 ```
-chmod 777 workspace
+sudo chmod 777 workspace
 ```
 Now initialization finished and and then every time you want to run dey, just use :
 ```
