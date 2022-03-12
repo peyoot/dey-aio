@@ -1,0 +1,19 @@
+version: '3'
+services:
+  dey30:
+    restart: always
+    user: dey
+    image: digidotcom/dey:dey-3.0-r4
+    container_name: dey30
+#    ports:
+#      - "21:21"
+#    environment:
+#      - DEY-MIRROR_URL=dey-mirror.eccee.com
+#      - DEY-MIRROR_PORT=1080
+    volumes:
+      - ./workspace:/home/dey/workspace:rw
+    entrypoint:
+#      - bash
+      - /home/dey/docker-entrypoint.sh
+networks:
+  default:
