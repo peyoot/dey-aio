@@ -14,7 +14,6 @@ It contain docker-compose file and also some scripts to help you pack and publis
 dey-aio
 ```
 /
-
 ├── dey30                      DEY version
 │   ├── workspace
 ├── dey32
@@ -44,17 +43,18 @@ dey-aio
     ```
     $ git clone https://github.com/peyoot/dey-aio.git
     ```
-3. Add current user to group `docker`：
+3. Add current user to group `docker` and reboot：
     ```
     $ sudo gpasswd -a ${USER} docker
+    $ sudo reboot
     ```
 4. Start docker containers
   * Initialization 
-   Please note, If it's the first time you use the specific version , initialization will be needed to generate workspace folder within it. Go to the dey version folder and then run:
+   Please note if it's the first time you use the specific version , initialization will be needed to generate workspace folder within it. Go to the dey version folder and then run:
 ```
 docker-compose up
 ```
-Wait till everything is ready and use ctrl+c to exit. Now workspace folder have been generated. You need to give this folder full read/write priviledge so that containers can work as expected.
+Wait till everything is ready and it will exit automatically. Now workspace folder have been generated. You need to give this folder full read/write priviledge so that containers can work as expected.
 ```
 sudo chmod 777 workspace
 ```
