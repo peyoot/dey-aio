@@ -71,17 +71,22 @@ exec 3<&1
 
 BRANCH=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF-1)}')
+PLATFORM=""
 
 #check if any git repository avaialbe in workspace
 if [ ! -d .git ]; then
     WORKSPACE_GIT="no"
+    echo "You're at not in any branch now! A workspace git repository will facilitate you on revision management"
+#    echo "Please choose the platform that you're working on:"
+#    echo "1. ConnectCore 6UL"
+#    echo "2. ConnectCore 8M Nano"
+#    echo "3. ConnectCore 8x"
+#    PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to copy release" "1")
 else
     WORKSPACE_GIT="yes"
     BRANCH=$(git status |head -1 | awk '{ print $3 }')
     PLATFORM=${BRANCH%-*}
 fi
-
-
 
 echo "DEY version is ${DEY_VERSION}"
 echo "BRANCH is ${BRANCH}"
