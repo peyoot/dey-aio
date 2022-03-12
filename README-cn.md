@@ -48,11 +48,13 @@ sudo apt install docker.io docker-compose
     ```
     $ git clone https://github.com/peyoot/dey-aio.git
     ```
-3. 添加当前用户到docker用户组：
+3. 添加当前用户到docker用户组并重启：
     ```
     $ sudo gpasswd -a ${USER} docker
+    $ sudo reboot
     ```
 4. 开始使用容器化的dey-aio中的各种dey版本
+  重启后，当前用户就可以直接使用docker和docker-compose的各种命令了。
   * 初始化
   
   第一次使用某个版本的dey，需要先初始化一下，以便生成workspace目录并赋予完整权限，对应版本的dey容器才能正常使用。
@@ -60,12 +62,13 @@ sudo apt install docker.io docker-compose
   ```
 docker-compose up
 ```
-等到相关镜像下载并生成好后，用ctrl+c退出。此时该目录下已经生成了worksapce目录，赋予777完整权限。
+等到相关镜像下载并生成好后，会自动退出。此时该目录下已经生成了worksapce目录，需要赋予777完整读写权限。
 
 ```
 sudo chmod 777 workspace
 ```
-初始化到此就结束了，以后就可以直接运行该版本的容器，要运行该DEY版本主，用：
+初始化到此就结束了，以后就可以直接运行该版本的容器。
+要运行该DEY版本主，用：
 
 ```
 docker-compose run dey<版本号>
