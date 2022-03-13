@@ -155,23 +155,29 @@ else
   exit 1
 fi
 
+# preprare copy to release
+
+SRC_BASE="${PLATFORM}/tmp/deploy/images/${PLATFORM}"
+if [ "no" = "$WORKSPACE_GIT" ]; then
+  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}"
+else
+  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}/${BRANCH}"
+fi
+if [ ! -d $DEST_PATH ]; then
+  mkdir -p $DEST_PATH
+fi
+
 # review information before publish
 
 echo "You are about to copy the ${PLATFORM} ${DEY_VERSION} images to release folde. Image type:${IMAGE} workspace git branch:${BRANCH}"
-if prompt-yesno "Is the info correct?" yes; then
-
-  SRC_BASE="${PLATFORM}/tmp/deploy/images/${PLATFORM}"
-  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}/${BRANCH}"
-  if [ ! -d $DEST_PATH ]; then
-    mkdir -p $DEST_PATH
-  fi
+if prompt-yesno "Scripts will copy major images to release folder, continue?" yes; then
   cp ${SRC_BASE}/u-boot.imx ${DEST_PATH}/
   cp ${SRC_BASE}/u-boot-ccimx6ulsbc512MB.imx ${DEST_PATH}/
   cp ${SRC_BASE}/u-boot-ccimx6ulsbc1GB.imx ${DEST_PATH}/
-  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/${IMAGE}-${PLATFORM}.boot.ubifs ${DEST_PATH}/
-  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/${IMAGE}-${PLATFORM}.recovery.ubifs ${DEST_PATH}/
-  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/${IMAGE}-${PLATFORM}.ubifs ${DEST_PATH}/
-  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/install_linux* ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.ubifs ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.recovery.ubifs ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.ubifs ${DEST_PATH}/
+  cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
   echo "major images have been copied to release path"
 
   if prompt-yesno "Do you want to pack images to create an installer zip file?" yes; then
@@ -180,34 +186,24 @@ if prompt-yesno "Is the info correct?" yes; then
     zip -j ${DEST_PATH}/my_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/my_sd_installer.zip
   fi
 else
-  echo "you've chosen to quit"
-  exit 1
+  echo "you've chosen not to copy images to release folder! Make sure release folder already have the latest one. "
+  echo "publishing to web/tftp will base on the images and zip files that are in release folder"
 fi
 
 if prompt-yesno "Would you like to publish the releases to the web/tftp server?" "no"; then
     echo "Please choose where you'd like publish:"
-    echo "1. Publish to ./tftpboot"
+    echo "1. Publish to TFTP Server folder"
     echo "2. Publish to dey-mirror"
-    echo "3. Publish both to tftpboot and dey-mirror"
     PUBLISH=$(prompt-numeric "Please choose where you'd like to publish releases" "1")
     if [ "1" = "$PUBLISH" ]; then
-       echo "copying the release to ./tftpboot"
-       cp ${DEST_PATH}/${IMAGE}* ./tftpboot/
-       cp ${DEST_PATH}/u-boot* ./tftpboot/
+       TFTP_PATH=$(prompt "Please input the path of tftp folder:" "${DEST_PATH}/tftpboot")
+       mkdir -p ${TFTP_PATH}
+       echo "copying the release to the giving tftp folder"
+       
+       cp ${DEST_PATH}/${IMAGE}* ${TFTP_PATH}/
+       cp ${DEST_PATH}/u-boot* ${TFTP_PATH}/
     elif [ "2" = "$PUBLISH" ]; then
        echo "copying the release to dey-mirror"
-       USERNAME=$(prompt "Please input the username of dey-mirror server" "")
-       if [ "robin" = "${USERNAME}" ]; then
-         echo "you'll need to input correct password to authenticate yourself"
-         rsync -avzP ${DEST_PATH}/*.zip '-e ssh -p 10022' robin@101.231.59.67:/home/robin/docker/dnmp/www/dey-mirror/dey-images/${DEST_PATH}/
-       else
-         echo "You don't have the right to access eccee server"
-         exit 1
-       fi
-    elif [ "3" = "$PUBLISH" ]; then
-       echo "copying the release both to tftp server and dey-mirror"
-       cp ${DEST_PATH}/${IMAGE}* ./tftpboot/
-       cp ${DEST_PATH}/${UBOOTPRE}* ./tftpboot/
        USERNAME=$(prompt "Please input the username of dey-mirror server" "")
        if [ "robin" = "${USERNAME}" ]; then
          echo "you'll need to input correct password to authenticate yourself"
