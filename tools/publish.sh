@@ -192,8 +192,9 @@ fi
 
 if prompt-yesno "Would you like to publish the releases to the web/tftp server?" "no"; then
     echo "Please choose where you'd like publish:"
-    echo "1. Publish to TFTP Server folder"
+    echo "1. Publish to TFTP folder"
     echo "2. Publish to dey-mirror"
+    echo "3. Publish to your own server"
     PUBLISH=$(prompt-numeric "Please choose where you'd like to publish releases" "1")
     if [ "1" = "$PUBLISH" ]; then
        TFTP_PATH=$(prompt "Please input the path of tftp folder:" "${DEST_PATH}/tftpboot")
@@ -205,13 +206,20 @@ if prompt-yesno "Would you like to publish the releases to the web/tftp server?"
     elif [ "2" = "$PUBLISH" ]; then
        echo "copying the release to dey-mirror"
        USERNAME=$(prompt "Please input the username of dey-mirror server" "")
+       SERVER_IP=
        if [ "robin" = "${USERNAME}" ]; then
          echo "you'll need to input correct password to authenticate yourself"
-         rsync -avzP ${DEST_PATH}/*.zip '-e ssh -p 10022' robin@101.231.59.67:/home/robin/docker/dnmp/www/dey-mirror/dey-images/${DEST_PATH}/
+         rsync -avzP ${DEST_PATH}/*.zip '-e ssh -p 10022' robin@101.231.59.68:/home/robin/docker/dnmp/www/dey-mirror/dey-images/release
        else
          echo "You don't have the right to access eccee server"
          exit 1
        fi
+    elif [ "3" = "$PUBLISH" ]; then
+       echo "copying the release installer to your own server by scp command"
+       SERVER_IP=$(prompt "Please input the server IP address" "")
+       USERNAME=$(prompt "Please input the username of the erver" "")
+       SERVER_PATH=$(prompt "Please input path on the server where you want to store the published installer" "")
+       scp ${DEST_PATH}/my_sd_installer.zip ${USERNAME}@${SERVER_IP}:${SERVER_PATH}
     else
        echo "Please input the right choice"
        exit 1
