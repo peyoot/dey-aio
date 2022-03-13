@@ -107,87 +107,81 @@ exec 3<&1
 
 BRANCH=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF-1)}')
-PLATFORM=""
 
 #check if any git repository avaialbe in workspace
 if [ ! -d .git ]; then
     WORKSPACE_GIT="no"
-    echo "You're at not in any branch now! A workspace git repository will facilitate you on revision management"
-    echo "try to find out your projects"
-    plist=( $(ls -l |grep -E '^d'|grep cc | awk '{print $9}') )
-    echo "${plist[@]}"
-    echo ${#plist[*]}
-    NUM=${#plist[@]}
-    echo "please select the platform"
-    for ((i=0;i<$NUM;i++)); do
-      j=$((i+1))
-      echo "${j} ${plist[${i}]}"
-#      echo "${i}"
-#      echo "${plist[${i}]}\n"
-    done
-    PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
-    PLATFORM=${plist[((PLATFORM_SELECTOR-1))]}
-    echo "platform in array selected is ${PLATFORM}"
-
+    echo "Your workspace do not have any branch now! A workspace git repository will facilitate you on revision management"
 
 else
     WORKSPACE_GIT="yes"
     BRANCH=$(git status |head -1 | awk '{ print $3 }')
-    PLATFORM=${BRANCH%-*}
+#    PLATFORM_SHORT=${BRANCH%-*}
+fi
+# Automatically check projects in workspace 
+echo "Try to find out your projects in workspace"
+PLIST=( $(ls -l |grep -E '^d'|grep cc | awk '{print $9}') )
+#    echo "${PLIST[@]}"
+#    echo ${#PLIST[*]}
+NUM=${#PLIST[@]}
+echo "Please select the hardware platform you are about to publish:"
+for ((i=0;i<$NUM;i++)); do
+  j=$((i+1))
+  echo "${j} ${PLIST[${i}]}"
+done
+PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
+if [ ${PLATFORM_SELECTOR} -le ${NUM} ]; then
+  PLATFORM=${PLIST[((PLATFORM_SELECTOR-1))]}
+  echo "platform in array selected is ${PLATFORM}"
+else
+  echo "please input the number within options.Abort now!"
+  exit 1
 fi
 
-echo "DEY version is ${DEY_VERSION}"
-echo "BRANCH is ${BRANCH}"
-echo "platform is ${PLATFORM}"
+#image type selection
+echo "Please choose the  image type you're about to publish"
+echo "1. dey-image-qt"
+echo "2. core-image-base"
+echo "3. dey-image-tiny"
+IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
+if [ "1" = "$IMAGE_SELECTOR" ]; then
+  IMAGE="dey-image-qt-${XSERVER}"
+elif [ "2" = "$IMAGE_SELECTOR" ]; then
+  IMAGE="core-image-base"
+elif [ "3" = "$IMAGE_SELECTOR" ]; then
+  IMAGE="dey-image-tiny"
+else
+  echo "please input the right choice"
+  exit 1
+fi
 
-notexec() { # start block comments
+# review information before publish
 
+echo "You are about to copy the ${PLATFORM} ${DEY_VERSION} images to release folde. Image type:${IMAGE} workspace git branch:${BRANCH}"
+if prompt-yesno "Is the info correct?" yes; then
 
+  SRC_BASE="${PLATFORM}/tmp/deploy/images/${PLATFORM}"
+  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}/${BRANCH}"
+  if [ ! -d $DEST_PATH ]; then
+    mkdir -p $DEST_PATH
+  fi
+  cp ${SRC_BASE}/u-boot.imx ${DEST_PATH}/
+  cp ${SRC_BASE}/u-boot-ccimx6ulsbc512MB.imx ${DEST_PATH}/
+  cp ${SRC_BASE}/u-boot-ccimx6ulsbc1GB.imx ${DEST_PATH}/
+  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/${IMAGE}-${PLATFORM}.boot.ubifs ${DEST_PATH}/
+  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/${IMAGE}-${PLATFORM}.recovery.ubifs ${DEST_PATH}/
+  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/${IMAGE}-${PLATFORM}.ubifs ${DEST_PATH}/
+  cp ${SRC_BASE}/tmp/deploy/images/${PLATFORM}/install_linux* ${DEST_PATH}/
+  echo "major images have been copied to release path"
 
-BRANCH=master
-if [ "$BRANCH" = "master" ]; then
-    echo "You're at not in any branch now"
-    echo "Please choose the platform that you're working on:"
-    echo "1. ConnectCore 6UL"
-    echo "2. ConnectCore 8M Nano"
-    echo "3. ConnectCore 8x"
-    PLATFORM=$(prompt-numeric "Which one you are going to copy release" "1")
-    echo "Please choose the  image type you're about to copy:"
-    echo "1. dey-image-qt"
-    echo "2. core-image-base"
-    echo "3. dey-image-tiny"
-    IMAGE_TYPE=$(prompt-numeric "which kind of image you're going to publish" "1")
-
-    if [ "1" = "$IMAGE_TYPE" ]; then
-      IMAGE="dey-image-qt-${XSERVER}"
-    elif [ "2" = "$IMAGE_TYPE" ]; then
-      IMAGE="core-image-base"
-    elif [ "3" = "$IMAGE_TYPE" ]; then
-      IMAGE="dey-image-tiny"
-    else
-      echo "please input the right choice"
-      exit 1
-    fi
-    DEST_PATH="release/cc${CPU}/${DEY}"
-    if [ ! -d $DEST_PATH ]; then
-        mkdir -p $DEST_PATH
-    fi
-
-    echo "you're about to copy  ${IMAGE} to publish folder"
-#    cp ${SOURCE_PATH}/${IMAGE}-cc${CPU}sbc.boot.ubifs ${DEST_PATH}/
-    cp ${SOURCE_PATH}/${IMAGE}-${SBC}.boot.${KFS} ${DEST_PATH}/
-    cp ${SOURCE_PATH}/${IMAGE}-${SBC}.${RFS} ${DEST_PATH}/
-    cp ${SOURCE_PATH}/${IMAGE}-${SBC}.recovery.${KFS} ${DEST_PATH}/
-    cp ${SOURCE_PATH}/${UBOOTPRE}-${SBC}*.${UBOOTEXT} ${DEST_PATH}/
-    cp ${SOURCE_PATH}/install_linux_fw_sd.scr ${DEST_PATH}/
-    echo "....."
-    echo "Successfully copy images from ${SOURCE_PATH} to release/cc${CPU}"
-    if prompt-yesno "Do you want to pack images to create an installer zip file?" yes; then
-        sync
-        sleep 2
-        zip -j ${DEST_PATH}/my_sd_installer.zip ${DEST_PATH}/${IMAGE}*.* ${DEST_PATH}/${UBOOTPRE}-${SBC}*.${UBOOTEXT} ${DEST_PATH}/install_linux_fw_sd.scr -x ${DEST_PATH}/my_sd_installer.zip
-    fi
-
+  if prompt-yesno "Do you want to pack images to create an installer zip file?" yes; then
+    sync
+    sleep 2
+    zip -j ${DEST_PATH}/my_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/my_sd_installer.zip
+  fi
+else
+  echo "you've chosen to quit"
+  exit 1
 fi
 
 if prompt-yesno "Would you like to publish the releases to the web/tftp server?" "no"; then
@@ -227,8 +221,6 @@ if prompt-yesno "Would you like to publish the releases to the web/tftp server?"
        exit 1
     fi
 fi
-
-} #end block comments
 
 }
 _ "$0" "$@"
