@@ -52,6 +52,42 @@ prompt-yesno() {
     echo "*** Please answer \"yes\" or \"no\"."
   done
 }
+
+platform-selector(){
+  if [ "1" =  "$PLATFORM_SELECTOR" ]; then
+    echo "You have choose cc6ul platform to publish"
+#    SOURCE_PATH="cc6ulsbc/tmp/deploy/images/ccimx6ulsbc"
+#        CPU="imx6ul"
+#        SBC="ccimx6ulsbc"
+#        KFS="ubifs"
+#        RFS="ubifs"
+#        XSERVER="x11"
+#        UBOOTPRE="u-boot"
+#        UBOOTEXT="imx"
+  fi
+  if [ "2" = "$PLATFORM_SELECTOR" ]; then
+    SOURCE_PATH="tmp/deploy/images/ccimx8mn-dvk"
+    CPU="imx8mn"
+    SBC="ccimx8mn-dvk"
+    KFS="vfat"
+    RFS="ext4"
+    XSERVER="xwayland"
+    UBOOTPRE="imx-boot"
+    UBOOTEXT="bin"
+  fi
+  if [ "3" = "$PLATFORM_SELECTOR" ]; then
+        SOURCE_PATH="tmp/deploy/images/ccimx8x-sbc-pro"
+        CPU="imx8x"
+        SBC="ccimx8x-sbc-pro"
+        KFS="vfat"
+        RFS="ext4"
+        XSERVER="xwayland"
+        UBOOTPRE="imx-boot"
+        UBOOTEXT="bin"
+  fi
+}
+
+
 # define global variables
 
 #check if parent folder is ready
@@ -77,11 +113,23 @@ PLATFORM=""
 if [ ! -d .git ]; then
     WORKSPACE_GIT="no"
     echo "You're at not in any branch now! A workspace git repository will facilitate you on revision management"
-#    echo "Please choose the platform that you're working on:"
-#    echo "1. ConnectCore 6UL"
-#    echo "2. ConnectCore 8M Nano"
-#    echo "3. ConnectCore 8x"
-#    PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to copy release" "1")
+    echo "try to find out your projects"
+    plist=( $(ls -l |grep -E '^d'|grep cc | awk '{print $9}') )
+    echo "${plist[@]}"
+    echo ${#plist[*]}
+    NUM=${#plist[@]}
+    echo "please select the platform"
+    for ((i=0;i<$NUM;i++)); do
+      j=$((i+1))
+      echo "${j} ${plist[${i}]}"
+#      echo "${i}"
+#      echo "${plist[${i}]}\n"
+    done
+    PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
+    PLATFORM=${plist[((PLATFORM_SELECTOR-1))]}
+    echo "platform in array selected is ${PLATFORM}"
+
+
 else
     WORKSPACE_GIT="yes"
     BRANCH=$(git status |head -1 | awk '{ print $3 }')
@@ -94,17 +142,6 @@ echo "platform is ${PLATFORM}"
 
 notexec() { # start block comments
 
-echo "You are about to copy images that you just built to the release folder."
-echo "Please choose DEY version"
-echo "1. DEY 3.2"
-echo "2. DEY 3.0"
-DEY_VERSION=$(prompt-numeric "Which DEY version you're working on?" "2")
-if [ "1" = "$DEY_VERSION" ]; then
-   DEY="3.2"
-else
-   DEY="3.0"
-fi
-echo "DEY_VERSION"
 
 
 BRANCH=master
@@ -120,38 +157,6 @@ if [ "$BRANCH" = "master" ]; then
     echo "2. core-image-base"
     echo "3. dey-image-tiny"
     IMAGE_TYPE=$(prompt-numeric "which kind of image you're going to publish" "1")
-
-    if [ "1" =  "$PLATFORM" ]; then
-        echo "Now copying cc6ul release"
-        SOURCE_PATH="cc6ulsbc/tmp/deploy/images/ccimx6ulsbc"
-        CPU="imx6ul"
-        SBC="ccimx6ulsbc"
-        KFS="ubifs"
-        RFS="ubifs"
-        XSERVER="x11"
-        UBOOTPRE="u-boot"
-        UBOOTEXT="imx"
-    fi
-    if [ "2" = "$PLATFORM" ]; then
-        SOURCE_PATH="tmp/deploy/images/ccimx8mn-dvk"
-        CPU="imx8mn"
-        SBC="ccimx8mn-dvk"
-        KFS="vfat"
-        RFS="ext4"
-        XSERVER="xwayland"
-        UBOOTPRE="imx-boot"
-        UBOOTEXT="bin"
-    fi
-    if [ "3" = "$PLATFORM" ]; then
-        SOURCE_PATH="tmp/deploy/images/ccimx8x-sbc-pro"
-        CPU="imx8x"
-        SBC="ccimx8x-sbc-pro"
-        KFS="vfat"
-        RFS="ext4"
-        XSERVER="xwayland"
-        UBOOTPRE="imx-boot"
-        UBOOTEXT="bin"
-    fi
 
     if [ "1" = "$IMAGE_TYPE" ]; then
       IMAGE="dey-image-qt-${XSERVER}"
