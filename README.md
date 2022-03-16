@@ -15,9 +15,14 @@ dey-aio
 ```
 /
 ├── dey3.0                      DEY version
+│   ├──docker-compose.yml
+│   ├── publish.sh
 │   ├── workspace
 ├── dey3.2
+│   ├──docker-compose.yml
+│   ├── publish.sh
 │   ├── workspace
+| ...
 ├── release                    released folders (when you use publishing tools)
 │   ├── dey3.0                   
 │        ├── cc6ul
@@ -28,12 +33,11 @@ dey-aio
 │        ├── ...
 │   ├── dey3.2                   
 │        ├── ...
-│   └── dey3.3                   
-│        ├── ...
+│   └ ...
 ├── tools                       publishing tools
 │   ├── publish.sh
-├── docker-compose.sample.yml   docker-compose sample
-└── env.smaple                  environment file sample
+├── README.md
+└── README-cn.md
 ```
 ## 3. Usage
 1. Install `git`, `docker` and `docker-compose`;
