@@ -74,6 +74,15 @@ Here, dey<version> can be dey3.0,dey3.2,etc.
 
 To exit, Please type `exit` inside the container and then run: `docker-compose down` to remove this container.
 
+  * additional packages 
+For dey3.0, You'll need to upgrade and install additional packages.
+
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt install git-lfs -y
+
+dey is also the default password you need to input
+
 
 ## 4. License
 MIT

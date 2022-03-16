@@ -88,6 +88,15 @@ dey<版本号>可以是dey30,dey32等已经初始化好的容器
 
 要退出容器，在容器内的命令行输入：exit ，并用docker-compose down来移除相关容器
 
+   * 容器内必须的安装包
+对于DEY3.0，由于镜像构建时间较早，为了能正常使用，需要在dey3.0容器内安装额外的软件包，以应对最新的dey recipe需求。
+执行这些命令：
+sudo apt update -y
+sudo apt upgrade -y
+sudo -y apt install git-lfs
+在执行sudo需要输入密码，请输入dey
+
+
 
 ## 4. License
 MIT
