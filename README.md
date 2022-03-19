@@ -64,21 +64,29 @@ Now initialization finished and and then every time you want to run dey, just us
 ```
 docker-compose run dey<version>
 ```
-for example, go to the initialized dey3.0 folder and run
+for example, go to the initialized dey3.2 folder and run
 ```
-docker-compose run dey3.0
+docker-compose run dey3.2
 ```
 
   * General Usage
 To start the specific dey container, got to folder and run:
 ```
-docker-composerun dey<version>
+docker-compose run dey<version>
 ```
 Here, dey<version> can be dey3.0,dey3.2,etc.
 
-To exit, Please type `exit` inside the container and then run: `docker-compose down` to remove this container.
+To exit, Please type `exit` inside the container. In this way, the container still runing and you can go back to the container by "docker exec -it  <container id> bash " to go back to dey container.
+To find out the runing/stopped container ID, use "docker ps" or "docker ps -a"
+
+if you want to remove container, just un : `docker-compose down` to remove it. 
 
   * additional packages 
+Scripts will need to use zip to pack the installer. so please install it in container
+
+sudo apt install zip
+
+
 For dey3.0, You'll need to upgrade and install additional packages.
 
 sudo apt update -y

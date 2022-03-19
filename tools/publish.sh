@@ -177,6 +177,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
   cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.ubifs ${DEST_PATH}/
   cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.recovery.ubifs ${DEST_PATH}/
   cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.ubifs ${DEST_PATH}/
+#  cp ${SRC_DTB}/imx6ul-${PLATFORM}*.dtb ${DEST_PATH}/
   cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
   echo "major images have been copied to release path"
 
