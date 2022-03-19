@@ -106,8 +106,9 @@ exec 3<&1
 #main process
 
 BRANCH=""
+PROJECT=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF-1)}')
-
+echo "dey version is ${DEY_VERSION}"
 #check if any git repository avaialbe in workspace
 if [ ! -d .git ]; then
     WORKSPACE_GIT="no"
@@ -115,9 +116,15 @@ if [ ! -d .git ]; then
 
 else
     WORKSPACE_GIT="yes"
-    BRANCH=$(git status |head -1 | awk '{ print $3 }')
+    HEADP=$(cat .git/HEAD)
+    BRANCH=${HEADP##*/}
+#    BRANCH=$(git status |head -1 | awk '{ print $3 }')
 #    PLATFORM_SHORT=${BRANCH%-*}
+    PROJECT=${BRANCH#*-}
+    echo "project id is ${PROJECT}"
 fi
+
+
 # Automatically check projects in workspace 
 echo "Try to find out your projects in workspace"
 PLIST=( $(ls -l |grep -E '^d'|grep cc | awk '{print $9}') )
@@ -133,6 +140,24 @@ PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
 if [ ${PLATFORM_SELECTOR} -le ${NUM} ]; then
   PLATFORM=${PLIST[((PLATFORM_SELECTOR-1))]}
   echo "platform in array selected is ${PLATFORM}"
+#prepare display server type
+  if [[ "${PLATFORM}" =~ "6ul" ]] ; then
+     echo "it's 6ul platrom"
+     DISPLAY_SERVER="x11"
+     FS1="ubifs"
+     FS2="ubifs"
+     UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+     SRC_DTB="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
+     SRC_UBOOT="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
+  elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
+     echo "it's mp1 platform"
+  else
+     echo "it's wayland platform"
+     DISPLAY_SERVER="wayland"
+     FS1="vfat"
+     FS2="ext4.gz"
+  fi
+
 else
   echo "please input the number within options.Abort now!"
   exit 1
@@ -145,7 +170,7 @@ echo "2. core-image-base"
 echo "3. dey-image-tiny"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
-  IMAGE="dey-image-qt-${XSERVER}"
+  IMAGE="dey-image-qt-${DISPLAY_SERVER}"
 elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
 elif [ "3" = "$IMAGE_SELECTOR" ]; then
@@ -154,6 +179,8 @@ else
   echo "please input the right choice"
   exit 1
 fi
+
+
 
 # preprare copy to release
 
@@ -171,14 +198,25 @@ fi
 
 echo "You are about to copy the ${PLATFORM} ${DEY_VERSION} images to release folde. Image type:${IMAGE} workspace git branch:${BRANCH}"
 if prompt-yesno "Scripts will copy major images to release folder, continue?" yes; then
+# copy from images folder
+  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.recovery.${FS1} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.${FS2} ${DEST_PATH}/
   cp ${SRC_BASE}/u-boot.imx ${DEST_PATH}/
-  cp ${SRC_BASE}/u-boot-ccimx6ulsbc512MB.imx ${DEST_PATH}/
-  cp ${SRC_BASE}/u-boot-ccimx6ulsbc1GB.imx ${DEST_PATH}/
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.ubifs ${DEST_PATH}/
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.recovery.ubifs ${DEST_PATH}/
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.ubifs ${DEST_PATH}/
-#  cp ${SRC_DTB}/imx6ul-${PLATFORM}*.dtb ${DEST_PATH}/
-  cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
+  if prompt-yesno "copy uboot/dtb/scripts files from tmp/deploy/images?" yes; then
+    cp ${SRC_BASE}/${UBOOT_FILE} ${DEST_PATH}/
+    cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
+    cp ${SRC_BASE}/boot.scr ${DEST_PATH}/
+  else
+    cp ${SRC_UBOOT}/${UBOOT_FILE} ${DEST_PATH}/
+    cp ${SRC_UBOOT}/install_linux* ${DEST_PATH}/
+    cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
+  fi
+# copy developping dtb
+  if [ "" != "${PROJECT}" ]; then
+    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
+  fi
+
   echo "major images have been copied to release path"
 
   if prompt-yesno "Do you want to pack images to create an installer zip file?" yes; then
@@ -201,7 +239,6 @@ if prompt-yesno "Would you like to publish the releases to the web/tftp server?"
        TFTP_PATH=$(prompt "Please input the path of tftp folder:" "${DEST_PATH}/tftpboot")
        mkdir -p ${TFTP_PATH}
        echo "copying the release to the giving tftp folder"
-       
        cp ${DEST_PATH}/${IMAGE}* ${TFTP_PATH}/
        cp ${DEST_PATH}/u-boot* ${TFTP_PATH}/
     elif [ "2" = "$PUBLISH" ]; then
@@ -226,6 +263,7 @@ if prompt-yesno "Would you like to publish the releases to the web/tftp server?"
        exit 1
     fi
 fi
+
 
 }
 _ "$0" "$@"
