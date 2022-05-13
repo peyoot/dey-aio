@@ -87,12 +87,14 @@ Scripts will need to use zip to pack the installer. so please install it in cont
 sudo apt install zip
 
 
-For dey3.0, You'll need to upgrade and install additional packages.
+Now repository use peyoot/dey instead of official digidotcom/dey, no additional package need to be updated or installed.
 
+But if you use digidotcom/dey:dey3.0-r4, You'll need to upgrade and install additional packages as below
+```
 sudo apt update -y
 sudo apt upgrade -y
 sudo apt install git-lfs -y
-
+```
 dey is also the default password you need to input
 
 

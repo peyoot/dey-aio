@@ -3,7 +3,7 @@ services:
   dey3.2:
     restart: always
     user: dey
-    image: digidotcom/dey:dey-3.2-r2
+    image: peyoot/dey:dey-3.2-r3
     container_name: dey3.2
 #    ports:
 #      - "21:21"
