@@ -17,3 +17,5 @@ services:
       - /home/dey/docker-entrypoint.sh
 networks:
   default:
+    external:
+      name: pvpn
