@@ -57,11 +57,26 @@ sudo apt install docker.io docker-compose
     $ sudo reboot
     ```
 4. 开始使用容器化的dey-aio中的各种dey版本
-  重启后，当前用户就可以直接使用docker和docker-compose的各种命令了。
+   重启后，当前用户就可以直接使用docker和docker-compose的各种命令了。
+
+   **中国区用户必读：**
+
+   在使用前，最好在主机先自建一个docker网桥（使用中国区版本需执行下面命令）
+   ```
+    $ docker network create pvpn --subnet 172.100.100.0/24
+   ```
+
+  * 自建pvpn科学上网，只需一条命令，几个回车就能搭好！
+    需要有墙外的云服务器（AWS,阿里云，腾讯云等都行，最便宜的即可）作为出口，避免国内访问境外源不畅。
+    参考：https://github.com/peyoot/pvpn
+
+  搭好pvpn科学上网环境后，中国区只需拉取china分支，就可以自动配合pvpn科学上网的链路来运行各种所需容器。
+   
   * 初始化
   
+  
   第一次使用某个版本的dey，需要先初始化一下，以便生成workspace目录并赋予完整权限，对应版本的dey容器才能正常使用。
-  进入相关的dey目录，比如dey30，然后运行
+  进入相关的dey目录，比如dey3.2，然后运行
   ```
 docker-compose up
 ```
@@ -76,10 +91,10 @@ sudo chmod 777 workspace
 ```
 docker-compose run dey<版本号>
 ```
-比如运行dey3.0容器：
+比如运行dey3.2容器：
 
 ```
-docker-compose run dey30
+docker-compose run dey3.2
 ```
   * 日常使用
 要运行某个版本的dey，请到相应的目录下：
