@@ -150,7 +150,7 @@ do_mkproject() {
 	if [ -z "${MKP_OLD_PROJECT}" ]; then
 		# Customize project
 		chmod 644 ${MKP_PROJECTPATH}/conf/bblayers.conf ${MKP_PROJECTPATH}/conf/local.conf
-                sed -i -e 's,  ##DIGIBASE##/meta-digi/meta-digi-dey \\,  ##DIGIBASE##meta-digi/meta-digidey \\\n  ##DIGIBASE##/meta-custom \\,g' ${MKP_PROJECTPATH}/conf/bblayers.conf
+                sed -i -e 's,  ##DIGIBASE##/meta-digi/meta-digi-dey \\,  ##DIGIBASE##meta-digi/meta-digi-dey \\\n  ##DIGIBASE##/meta-custom \\,g' ${MKP_PROJECTPATH}/conf/bblayers.conf
 		sed -i -e "s,##DIGIBASE##,${MKP_SCRIPTPATH}/sources,g" ${MKP_PROJECTPATH}/conf/bblayers.conf
 		# At this point the user has accepted all the licenses, so enable the vendor EULA
 		sed -i -e "s,^#\(ACCEPT.*EULA\),\1,g" ${MKP_PROJECTPATH}/conf/local.conf
