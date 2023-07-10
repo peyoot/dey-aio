@@ -2,6 +2,8 @@
 DEY-AIO stands for Digi Embedded Yocto All In One.
 It contain docker-compose file and also some scripts to help you pack and publish your DEY images.
 
+Now dey-aio also support DEY native way as well as docker way to develop projects in the same place. There's a meta-custom layer by default installed and can be used as a reference to pack your own rootfs with your app and config files.
+
 **[[中文说明]](README-cn.md)**
 
 ## 1. Feature
@@ -14,32 +16,40 @@ It contain docker-compose file and also some scripts to help you pack and publis
 dey-aio
 ```
 /
-├── dey3.0                      DEY version
+├── dey4.0                      DEY version
 │   ├──docker-compose.yml
 │   ├── publish.sh
 │   ├── workspace
-├── dey3.2
+├── dey3.2                   (only available in legacy v1.1)
 │   ├──docker-compose.yml
 │   ├── publish.sh
 │   ├── workspace
 | ...
 ├── release                    released folders (when you use publishing tools)
-│   ├── dey3.0                   
+│   ├── dey4.0                   
 │        ├── cc6ul
 │        ├── ccmp15
 │        ├── cc8mn
 │        ├── cc8mm
 │        ├── cc8x
+│        ├── cc93
 │        ├── ...
 │   ├── dey3.2                   
 │        ├── ...
 │   └ ...
-├── tools                       publishing tools
+|
+├── meta-custom
+├── tools                       mkproject.sh and publishing tools
 │   ├── publish.sh
+|   |__ mkproject.sh
 ├── README.md
 └── README-cn.md
 ```
 ## 3. Usage
+Latest version use repo tool to manage the source code tree. Please also refer to https://github.com/peyoot/dey-aio-manifest
+
+For run dey in docker way, you can also use the following instrunctions.
+
 1. Install `git`, `docker` and `docker-compose`;
 2. Clone project:
     ```
