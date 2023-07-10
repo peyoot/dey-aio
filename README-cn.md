@@ -2,7 +2,7 @@
 dey-aio是Digi Embedded Yocto All In One的缩写。本项目旨在帮助用户使用docker-compose的方式快速搭建不同版本的dey，并使用发布工具，将需要的镜像或卡刷文件打包到发布目录或是dey-mirror镜像服务器，以便通过tftp服务器刷固件或是快速和其它人分享相关文件。
 
 v1.0  纯容器化的DEY开发环境和工具集   
-v2.0 （计划） 可以使用容器化的docker环境，也可以使用标准的开发方式，更方便管理DEY源码
+v2.0  可以使用容器化的docker环境，也可以使用标准的开发方式，更方便管理DEY源码
 
 **[[英文说明]](README.md)**
 
@@ -17,7 +17,7 @@ v2.0 （计划） 可以使用容器化的docker环境，也可以使用标准�
 dey-aio
 ```
 /
-├── dey3.0                     DEY版本
+├── dey4.0                     DEY版本
 │   ├──docker-compose.yml      
 │   ├── publish.sh             发布工具
 │   ├── workspace
@@ -27,7 +27,7 @@ dey-aio
 │   ├── workspace
 | ...
 ├── release                    发布文件夹 (可选发布到这里或服务器上)
-│   ├── dey3.0                   
+│   ├── dey4.0                   
 │        ├── cc6ul
 │        ├── ccmp15
 │        ├── cc8mn
@@ -39,10 +39,15 @@ dey-aio
 │   └ ...
 ├── tools                       工具箱
 │   ├── publish.sh
+│   |__ mkproject.sh
 ├── README.md
 └── README-cn.md
 
 ```
+最新版本采用repo的工具来管理源码树，请参考：https://github.com/peyoot/dey-aio-manifest/blob/main/README-cn.md
+
+如果您只使用docker的方式来开发，相关参考如下：
+
 ## 3. 用法
 1. 安装 `git`, `docker` 和 `docker-compose`;
 比如ubuntu下：
