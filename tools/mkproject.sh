@@ -160,14 +160,14 @@ do_mkproject() {
 	fi
 }
 
-# Keep the running script in sync with the one in the layer. If it differs,
-# update it (copy/overwrite) and warn the user.
-if ! cmp -s ${MKP_SCRIPTPATH}/${MKP_SCRIPTNAME} ${MKP_SCRIPTPATH}/sources/meta-digi/sdk/${MKP_SCRIPTNAME}; then
-	install -m 0555 ${MKP_SCRIPTPATH}/sources/meta-digi/sdk/${MKP_SCRIPTNAME} ${MKP_SCRIPTPATH}/${MKP_SCRIPTNAME}
-	printf "\n${MKP_GREEN}[INFO]:${MKP_NONE} %s\n" "the '${MKP_SCRIPTNAME}' script has been updated."
-	printf "\nPlease run '. ${BASH_SOURCE}' again.\n\n"
-	return
-fi
+## Keep the running script in sync with the one in the layer. If it differs,
+## update it (copy/overwrite) and warn the user.
+#if ! cmp -s ${MKP_SCRIPTPATH}/${MKP_SCRIPTNAME} ${MKP_SCRIPTPATH}/sources/meta-digi/sdk/${MKP_SCRIPTNAME}; then
+#	install -m 0555 ${MKP_SCRIPTPATH}/sources/meta-digi/sdk/${MKP_SCRIPTNAME} ${MKP_SCRIPTPATH}/${MKP_SCRIPTNAME}
+#	printf "\n${MKP_GREEN}[INFO]:${MKP_NONE} %s\n" "the '${MKP_SCRIPTNAME}' script has been updated."
+#	printf "\nPlease run '. ${BASH_SOURCE}' again.\n\n"
+#	return
+#fi
 
 # Verify if this is a new project (so we do NOT customize it)
 [ -r "${MKP_PROJECTPATH}/conf/bblayers.conf" -a -r "${MKP_PROJECTPATH}/conf/local.conf" ] && MKP_OLD_PROJECT="1"
