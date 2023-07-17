@@ -153,6 +153,8 @@ do_mkproject() {
                 sed -i -e 's,  ##DIGIBASE##/meta-digi/meta-digi-dey \\,  ##DIGIBASE##/meta-digi/meta-digi-dey \\\n  ##DIGIBASE##/meta-custom \\,g' ${MKP_PROJECTPATH}/conf/bblayers.conf
 		sed -i -e "s,##DIGIBASE##,${MKP_SCRIPTPATH}/sources,g" ${MKP_PROJECTPATH}/conf/bblayers.conf
 		# At this point the user has accepted all the licenses, so enable the vendor EULA
+		sed -i -e 's,^#DL_DIR ?= "${TOPDIR}/downloads",DL_DIR ?= "${TOPDIR}/../project_shared/downloads",g' ${MKP_PROJECTPATH}/conf/local.conf
+		sed -i -e 's,^#SSTATE_DIR ?= "${TOPDIR}/sstate-cache",SSTATE_DIR ?= "${TOPDIR}/../project_shared/sstate-cache",g' ${MKP_PROJECTPATH}/conf/local.conf
 		sed -i -e "s,^#\(ACCEPT.*EULA\),\1,g" ${MKP_PROJECTPATH}/conf/local.conf
 		# Create dey-setup-environment script
 		printf "${MKP_SETUP_ENVIRONMENT}" "${MKP_SCRIPTPATH}" > ${MKP_PROJECTPATH}/dey-setup-environment
