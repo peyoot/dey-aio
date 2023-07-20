@@ -2,8 +2,8 @@
 SUMMARY = "Home Addons" 
 DESCRIPTION = "Adding optional files to homedir" 
 LICENSE = "CLOSED" 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:" 
-RPROVIDES:${PN} += "${PN}" 
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:" 
+RPROVIDES_${PN} += "${PN}" 
 SRC_URI = "file://.profile \
         file://myfile.txt"
 # Specify where to get the files
@@ -18,5 +18,5 @@ do_install() {
         install -m 0644 ${WORKDIR}/myfile.txt ${D}/home/root/
 }
 
-FILES:${PN} += "/home/root/* \
+FILES_${PN} += "/home/root/* \
         /home/root/.profile"
