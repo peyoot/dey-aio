@@ -12,8 +12,8 @@ services:
 #      - DEY-MIRROR_PORT=1080
     volumes:
       - ./workspace:/home/dey/workspace:rw
-      - ../sources/meta-custom:/usr/local/dey-4.0/sources/meta-custom:rw
-      - ../tools/mkproject.sh:/usr/local/dey-4.0/mkproject.sh:ro
+      - ./sources/meta-custom:/usr/local/dey-4.0/sources/meta-custom:rw
+      - ./tools/mkproject.sh:/usr/local/dey-4.0/mkproject.sh:ro
     entrypoint:
 #      - bash
       - /home/dey/docker-entrypoint.sh
