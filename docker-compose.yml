@@ -13,7 +13,7 @@ services:
     volumes:
       - ./workspace:/home/dey/workspace:rw
       - ./sources/meta-custom:/usr/local/dey-3.2/sources/meta-custom:rw
-      - ./tools/mkproject.sh:/usr/local/dey-3.2/mkproject.sh:ro
+      - ./mkproject.sh:/usr/local/dey-3.2/mkproject.sh:ro
     entrypoint:
 #      - bash
       - /home/dey/docker-entrypoint.sh
