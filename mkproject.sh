@@ -3,7 +3,7 @@
 #
 #  mkproject.sh
 #
-#  Copyright (C) 2013-2022 by Digi International Inc.
+#  Copyright (C) 2013-2017 by Digi International Inc.
 #  All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify it
@@ -28,7 +28,7 @@ MKP_NONE="\033[0m"
 MKP_CONFIGPATH="${MKP_SCRIPTPATH}/sources/meta-digi/sdk/config"
 
 # Blacklist platforms (not officially supported in a DEY release)
-MKP_BLACKLIST_PLATFORMS="ccimx6qpsbc ccimx6sbc ccimx8x-sbc-express ccimx8x-sbc-pro"
+MKP_BLACKLIST_PLATFORMS=""
 
 MKP_SETUP_ENVIRONMENT='#!/bin/bash
 
@@ -93,20 +93,8 @@ do_license() {
 	local MKP_LICENSE_FILES=" \
 		${MKP_SCRIPTPATH}/sources/meta-digi/meta-digi-arm/DIGI_EULA \
 		${MKP_SCRIPTPATH}/sources/meta-digi/meta-digi-arm/DIGI_OPEN_EULA \
+		${MKP_SCRIPTPATH}/sources/meta-freescale/EULA \
 	"
-	if [ "${MKP_PLATFORM}" = "ccmp15-dvk" ] || [ "${MKP_PLATFORM}" = "ccmp13-dvk" ]; then
-		local SOC_VENDOR="STM"
-		MKP_LICENSE_FILES=" \
-			${MKP_LICENSE_FILES} \
-			${MKP_SCRIPTPATH}/sources/meta-st-stm32mp/conf/eula/ST_EULA_SLA \
-		"
-	else
-		local SOC_VENDOR="NXP"
-		MKP_LICENSE_FILES=" \
-			${MKP_LICENSE_FILES} \
-			${MKP_SCRIPTPATH}/sources/meta-freescale/EULA \
-		"
-	fi
 	[ -z "${MKP_PAGER+x}" ] && MKP_PAGER="| more"
 	eval cat - "${MKP_LICENSE_FILES}" <<-_EOF_ ${MKP_PAGER}; printf "\n"
 		+-------------------------------------------------------------------------------+
@@ -117,7 +105,7 @@ do_license() {
 		|                                                                               |
 		|      * Digi's end user license agreement                                      |
 		|      * Digi's third party and open source license notice                      |
-		|      * ${SOC_VENDOR} Semiconductors' software license agreement                         |
+		|      * NXP Semiconductors' software license agreement                         |
 		|                                                                               |
 		|  To have the right to use those binaries in your images you need to read and  |
 		|  accept the licenses.                                                         |
@@ -150,20 +138,25 @@ do_mkproject() {
 	if [ -z "${MKP_OLD_PROJECT}" ]; then
 		# Customize project
 		chmod 644 ${MKP_PROJECTPATH}/conf/bblayers.conf ${MKP_PROJECTPATH}/conf/local.conf
-                sed -i -e 's,  ##DIGIBASE##/meta-digi/meta-digi-dey \\,  ##DIGIBASE##/meta-digi/meta-digi-dey \\\n  ##DIGIBASE##/meta-custom \\,g' ${MKP_PROJECTPATH}/conf/bblayers.conf
+		sed -i -e 's,  ##DIGIBASE##/meta-digi/meta-digi-dey \\,  ##DIGIBASE##/meta-digi/meta-digi-dey \\\n  ##DIGIBASE##/meta-custom \\,g' ${MKP_PROJECTPATH}/conf/bblayers.conf
 		sed -i -e "s,##DIGIBASE##,${MKP_SCRIPTPATH}/sources,g" ${MKP_PROJECTPATH}/conf/bblayers.conf
-		# At this point the user has accepted all the licenses, so enable the vendor EULA
+		if [ -n "${MKP_VARIANT+x}" ]; then
+			sed -i -e "/^MACHINE_VARIANT =/cMACHINE_VARIANT = \"${MKP_VARIANT}\"" \
+				${MKP_PROJECTPATH}/conf/local.conf
+		fi
+		# At this point the user has accepted all the licenses, so enable the FSL EULA
 		sed -i -e 's,^#DL_DIR ?= "${TOPDIR}/downloads",DL_DIR ?= "${TOPDIR}/../project_shared/downloads",g' ${MKP_PROJECTPATH}/conf/local.conf
 		sed -i -e 's,^#SSTATE_DIR ?= "${TOPDIR}/sstate-cache",SSTATE_DIR ?= "${TOPDIR}/../project_shared/sstate-cache",g' ${MKP_PROJECTPATH}/conf/local.conf
-		sed -i -e "s,^#\(ACCEPT.*EULA\),\1,g" ${MKP_PROJECTPATH}/conf/local.conf
+
+		sed -i -e "s,^#ACCEPT_FSL_EULA,ACCEPT_FSL_EULA,g" ${MKP_PROJECTPATH}/conf/local.conf
 		# Create dey-setup-environment script
 		printf "${MKP_SETUP_ENVIRONMENT}" "${MKP_SCRIPTPATH}" > ${MKP_PROJECTPATH}/dey-setup-environment
 		chmod +x ${MKP_PROJECTPATH}/dey-setup-environment
 	fi
 }
 
-## Keep the running script in sync with the one in the layer. If it differs,
-## update it (copy/overwrite) and warn the user.
+# Keep the running script in sync with the one in the layer. If it differs,
+# update it (copy/overwrite) and warn the user.
 #if ! cmp -s ${MKP_SCRIPTPATH}/${MKP_SCRIPTNAME} ${MKP_SCRIPTPATH}/sources/meta-digi/sdk/${MKP_SCRIPTNAME}; then
 #	install -m 0555 ${MKP_SCRIPTPATH}/sources/meta-digi/sdk/${MKP_SCRIPTNAME} ${MKP_SCRIPTPATH}/${MKP_SCRIPTNAME}
 #	printf "\n${MKP_GREEN}[INFO]:${MKP_NONE} %s\n" "the '${MKP_SCRIPTNAME}' script has been updated."
@@ -177,10 +170,11 @@ do_mkproject() {
 # The script needs to be sourced (not executed) so make sure to
 # initialize OPTIND variable for getopts.
 OPTIND=1
-while getopts "lp:m:" c; do
+while getopts "lp:v:m:" c; do
 	case "${c}" in
 		l) MKP_LIST_PLATFORMS="y";;
 		p) MKP_PLATFORM="${OPTARG}";;
+		v) MKP_VARIANT="${OPTARG}";;
 		m) MKP_CONFIGPATH="${MKP_SCRIPTPATH}/sources/${OPTARG}/sdk/config";;
 	esac
 done
@@ -217,4 +211,5 @@ unset MKP_AVAILABLE_PLATFORMS \
       MKP_RED \
       MKP_SCRIPTNAME \
       MKP_SCRIPTPATH \
-      MKP_SETUP_ENVIRONMENT
+      MKP_SETUP_ENVIRONMENT \
+      MKP_VARIANT
