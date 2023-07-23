@@ -17,29 +17,36 @@ v2.0  可以使用容器化的docker环境，也可以使用标准的开发方�
 dey-aio
 ```
 /
-├── dey4.0                     DEY版本
-│   ├──docker-compose.yml      
-│   ├── publish.sh             发布工具
-│   ├── workspace
-├── dey3.2
+├── dey4.0                      DEY version
 │   ├──docker-compose.yml
-│   ├── publish.sh
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
+│   ├── workspace
+├── dey3.2                      DEY version
+│   ├──docker-compose.yml
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
 │   ├── workspace
 | ...
-├── release                    发布文件夹 (可选发布到这里或服务器上)
+├── release                    released folders (when you use publishing tools)
 │   ├── dey4.0                   
 │        ├── cc6ul
 │        ├── ccmp15
 │        ├── cc8mn
 │        ├── cc8mm
 │        ├── cc8x
+│        ├── cc93
 │        ├── ...
 │   ├── dey3.2                   
 │        ├── ...
 │   └ ...
-├── tools                       工具箱
-│   ├── publish.sh
-│   |__ mkproject.sh
+|
 ├── README.md
 └── README-cn.md
 
