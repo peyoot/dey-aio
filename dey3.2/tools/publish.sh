@@ -156,6 +156,8 @@ if [ ${PLATFORM_SELECTOR} -le ${NUM} ]; then
      DISPLAY_SERVER="xwayland"
      FS1="vfat"
      FS2="ext4.gz"
+     UBOOT_FILE="imx-boot-${PLATFORM}.bin"
+
   fi
 
 else
@@ -202,7 +204,6 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
   cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
   cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.recovery.${FS1} ${DEST_PATH}/
   cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.${FS2} ${DEST_PATH}/
-  cp ${SRC_BASE}/u-boot.imx ${DEST_PATH}/
   if prompt-yesno "copy uboot/dtb/scripts files from tmp/deploy/images?" yes; then
     cp ${SRC_BASE}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
