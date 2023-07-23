@@ -153,7 +153,7 @@ if [ ${PLATFORM_SELECTOR} -le ${NUM} ]; then
      echo "it's mp1 platform"
   else
      echo "it's wayland platform"
-     DISPLAY_SERVER="wayland"
+     DISPLAY_SERVER="xwayland"
      FS1="vfat"
      FS2="ext4.gz"
   fi
