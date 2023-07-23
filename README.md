@@ -18,11 +18,19 @@ dey-aio
 /
 ├── dey4.0                      DEY version
 │   ├──docker-compose.yml
-│   ├── publish.sh
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
 │   ├── workspace
-├── dey3.2                   (only available in legacy v1.1)
+├── dey3.2                      DEY version
 │   ├──docker-compose.yml
-│   ├── publish.sh
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
 │   ├── workspace
 | ...
 ├── release                    released folders (when you use publishing tools)
@@ -38,10 +46,6 @@ dey-aio
 │        ├── ...
 │   └ ...
 |
-├── meta-custom
-├── tools                       mkproject.sh and publishing tools
-│   ├── publish.sh
-|   |__ mkproject.sh
 ├── README.md
 └── README-cn.md
 ```
