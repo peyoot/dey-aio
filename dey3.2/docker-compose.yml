@@ -1,10 +1,10 @@
 version: '3'
 services:
-  dey4.0:
+  dey3.2:
     restart: always
     user: dey
-    image: peyoot/dey:dey-4.0-r3
-    container_name: dey4.0
+    image: peyoot/dey:dey-3.2-r3
+    container_name: dey3.2
 #    ports:
 #      - "21:21"
 #    environment:
@@ -12,8 +12,8 @@ services:
 #      - DEY-MIRROR_PORT=1080
     volumes:
       - ./workspace:/home/dey/workspace:rw
-      - ./sources/meta-custom:/usr/local/dey-4.0/sources/meta-custom:rw
-      - ./mkproject.sh:/usr/local/dey-4.0/mkproject.sh:ro
+      - ./sources/meta-custom:/usr/local/dey-3.2/sources/meta-custom:rw
+      - ./mkproject.sh:/usr/local/dey-3.2/mkproject.sh:ro
     entrypoint:
 #      - bash
       - /home/dey/docker-entrypoint.sh
