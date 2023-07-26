@@ -2,44 +2,62 @@
 DEY-AIO stands for Digi Embedded Yocto All In One.
 It contain docker-compose file and also some scripts to help you pack and publish your DEY images.
 
+Now dey-aio also support DEY native way as well as docker way to develop projects in the same place. There's a meta-custom layer by default installed and can be used as a reference to pack your own rootfs with your app and config files.
+
 **[[中文说明]](README-cn.md)**
 
 ## 1. Feature
 1. Completely open source.
-2. Support Multiple DEY versions (3.0 and upwards)
-3. Built-in packing and publishing tools.
-4. Support manage your own workspace git repositories under subfolders.
-5. more...
+2. DEY system development docker-compose tool. support all dey version in single folder (start from dey 3.2).
+3. docker-compose and native development way share same workspace and tools.
+4. meta-custom example to build firmwares that contains app,configs,drivers in the rootfs images.
+5. Share downloads and sstate-cache accross projects to save disk space
+6. Customer’s repo and Digi repo maintain seperately while work together to build.
+7. quickly copy the necessary images to release folder and pack installer zip file.
+8. Can also choose to publish to local TFTP server folder or scp to remote server for share.
+   and more ...
 ## 2.  Software Architecture
 dey-aio
 ```
 /
-├── dey3.0                      DEY version
+├── dey4.0                      DEY version
 │   ├──docker-compose.yml
-│   ├── publish.sh
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
 │   ├── workspace
-├── dey3.2
+├── dey3.2                      DEY version
 │   ├──docker-compose.yml
-│   ├── publish.sh
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
 │   ├── workspace
 | ...
 ├── release                    released folders (when you use publishing tools)
-│   ├── dey3.0                   
+│   ├── dey4.0                   
 │        ├── cc6ul
 │        ├── ccmp15
 │        ├── cc8mn
 │        ├── cc8mm
 │        ├── cc8x
+│        ├── cc93
 │        ├── ...
 │   ├── dey3.2                   
 │        ├── ...
 │   └ ...
-├── tools                       publishing tools
-│   ├── publish.sh
+|
 ├── README.md
 └── README-cn.md
 ```
 ## 3. Usage
+Latest version use repo tool to manage the source code tree. Please also refer to https://github.com/peyoot/dey-aio-manifest
+
+For run dey in docker way, you can also use the following instrunctions.
+
 1. Install `git`, `docker` and `docker-compose`;
 2. Clone project:
     ```
