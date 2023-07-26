@@ -8,21 +8,33 @@ Now dey-aio also support DEY native way as well as docker way to develop project
 
 ## 1. Feature
 1. Completely open source.
-2. Support Multiple DEY versions (3.0 and upwards)
-3. Built-in packing and publishing tools.
-4. Support manage your own workspace git repositories under subfolders.
-5. more...
+2. DEY system development docker-compose tool. support all dey version in single folder (start from dey 3.2).
+3. docker-compose and native development way share same workspace and tools.
+4. meta-custom example to build firmwares that contains app,configs,drivers in the rootfs images.
+5. Share downloads and sstate-cache accross projects to save disk space
+6. Customer’s repo and Digi repo maintain seperately while work together to build.
+7. quickly copy the necessary images to release folder and pack installer zip file.
+8. Can also choose to publish to local TFTP server folder or scp to remote server for share.
+   and more ...
 ## 2.  Software Architecture
 dey-aio
 ```
 /
 ├── dey4.0                      DEY version
 │   ├──docker-compose.yml
-│   ├── publish.sh
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
 │   ├── workspace
-├── dey3.2                   (only available in legacy v1.1)
+├── dey3.2                      DEY version
 │   ├──docker-compose.yml
-│   ├── publish.sh
+│   ├──mkproject.sh
+│   ├── sources
+│        ├── meta-custom
+│   ├── tools
+│        ├── publish.sh
 │   ├── workspace
 | ...
 ├── release                    released folders (when you use publishing tools)
@@ -38,10 +50,6 @@ dey-aio
 │        ├── ...
 │   └ ...
 |
-├── meta-custom
-├── tools                       mkproject.sh and publishing tools
-│   ├── publish.sh
-|   |__ mkproject.sh
 ├── README.md
 └── README-cn.md
 ```
