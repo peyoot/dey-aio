@@ -3,7 +3,7 @@ services:
   dey4.0:
     restart: always
     user: dey
-    image: peyoot/dey:dey-4.0-r3
+    image: peyoot/dey:dey-4.0-r4
     container_name: dey4.0
 #    ports:
 #      - "21:21"
