@@ -108,20 +108,26 @@ exec 3<&1
 BRANCH=""
 PROJECT=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF-1)}')
+NAND_SOM=(
+ccimx6ulsbc
+ccimx6ulstarter
+ccmp13-dvk
+ccmp15-dvk
+)
 echo "dey version is ${DEY_VERSION}"
-#check if any git repository avaialbe in workspace
+#check if any git repository avaialbe in current dey folder 
 if [ ! -d .git ]; then
-    WORKSPACE_GIT="no"
-    echo "Your workspace do not have any branch now! A workspace git repository will facilitate you on revision management"
+    PROJECT_GIT="no"
+    echo "You do not have any branch now! A git repository will facilitate you on revision management"
 
 else
-    WORKSPACE_GIT="yes"
+    PROJECT_GIT="yes"
     HEADP=$(cat .git/HEAD)
     BRANCH=${HEADP##*/}
 #    BRANCH=$(git status |head -1 | awk '{ print $3 }')
-#    PLATFORM_SHORT=${BRANCH%-*}
-    PROJECT=${BRANCH#*-}
-    echo "project id is ${PROJECT}"
+#  BRANCH_TRUNC equal later part of the BRANCH, first part before - removed 
+    BRANCH_TRUNC=${BRANCH#*-}
+    echo "BRANCH is ${BRANCH}"
 fi
 
 
@@ -136,29 +142,49 @@ for ((i=0;i<$NUM;i++)); do
   j=$((i+1))
   echo "${j} ${PLIST[${i}]}"
 done
-PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
-if [ ${PLATFORM_SELECTOR} -le ${NUM} ]; then
-  PLATFORM=${PLIST[((PLATFORM_SELECTOR-1))]}
-  echo "platform in array selected is ${PLATFORM}"
-#prepare display server type
+PROJECT_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
+if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
+  PROJECT=${PLIST[((PROJECT_SELECTOR-1))]}
+  echo "projects in array selected is ${PROJECT}"
+#  PLATFORM=$(ls -d ./workspace/${PROJECT}/tmp/deploy/image/*/ 2>/dev/null | head -n 1)
+  PLATFORM=$(grep 'MACHINE =' ./workspace/${PROJECT}/conf/local.conf | awk '{print $3}' | sed 's/"//g' )
+
+#prepare display server type, by default DISPLAY_SERVER is xwayland in define in final else
+  if [[ "${NAND_SOM[@]}"  =~ "${PLATFORM}" ]]; then
+    echo "som flash type is nand"
+    FS1="ubifs"
+    FS2="ubifs"
+  else
+    echo "som flash type is emmc"
+    FS1="vfat"
+    FS2="ext4.gz"
+  fi
+
+  if [[ "${PLATFORM}" =~ "ccmp" ]] ; then
+    echo "MPU type is ST"
+    echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
+  else
+    echo "MPU type is NXP"
+    
+  fi
+
+
   if [[ "${PLATFORM}" =~ "6ul" ]] ; then
      echo "it's 6ul platrom"
      DISPLAY_SERVER="x11"
-     FS1="ubifs"
-     FS2="ubifs"
      UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
      SRC_DTB="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
      SRC_UBOOT="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
-  elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
-     echo "it's mp1 platform"
+  elif [[ "${PLATFORM}" =~ "ccmp" ]] ; then
+     echo "it's ST platform"
   else
      echo "it's wayland platform"
      DISPLAY_SERVER="xwayland"
-     FS1="vfat"
-     FS2="ext4.gz"
      UBOOT_FILE="imx-boot-${PLATFORM}.bin"
 
   fi
+
+
 
 else
   echo "please input the number within options.Abort now!"
@@ -167,15 +193,21 @@ fi
 
 #image type selection
 echo "Please choose the  image type you're about to publish"
-echo "1. dey-image-qt"
-echo "2. core-image-base"
-echo "3. dey-image-tiny"
+echo "1. core-image-base"
+echo "2. dey-image-webkit"
+echo "3. dey-image-qt"
+echo "4. dey-image-tiny"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
-  IMAGE="dey-image-qt-${DISPLAY_SERVER}"
-elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
+
+elif [ "2" = "$IMAGE_SELECTOR" ]; then
+  IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
+
 elif [ "3" = "$IMAGE_SELECTOR" ]; then
+  IMAGE="dey-image-qt-${DISPLAY_SERVER}"
+elif [ "4" = "$IMAGE_SELECTOR" ]; then
+
   IMAGE="dey-image-tiny"
 else
   echo "please input the right choice"
@@ -187,7 +219,7 @@ fi
 # preprare copy to release
 
 SRC_BASE="${PLATFORM}/tmp/deploy/images/${PLATFORM}"
-if [ "no" = "$WORKSPACE_GIT" ]; then
+if [ "no" = "$PROJECT_GIT" ]; then
   DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}"
 else
   DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}/${BRANCH}"
