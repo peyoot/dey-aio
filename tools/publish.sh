@@ -127,7 +127,7 @@ fi
 
 # Automatically check projects in workspace 
 echo "Try to find out your projects in workspace"
-PLIST=( $(ls -l |grep -E '^d'| awk '{print $9}')| grep -v 'project_shared' )
+PLIST=( $(ls -l |grep -E '^d' |awk '{print $9}' |grep -v 'project_shared') )
 #    echo "${PLIST[@]}"
 #    echo ${#PLIST[*]}
 NUM=${#PLIST[@]}
