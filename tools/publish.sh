@@ -1,7 +1,10 @@
 #! /bin/bash
 #This scripts help you pack your release image files to DEY release folder
 #check out https://github.com/peyoot/dey-aio for more informaiton
- 
+#Author: Robin Tu  
+#twitter/X.com  peyoot_tu
+#
+
 if test -z "$BASH_VERSION"; then
   echo "Please run this script using bash, not sh or any other shell." >&2
   exit 1
@@ -115,27 +118,29 @@ ccmp13-dvk
 ccmp15-dvk
 )
 echo "dey version is ${DEY_VERSION}"
+
+
 #check if any git repository avaialbe in current dey folder 
+#if you run several projects with same SOM, it's very important to manage them with diferent branches 
+
 if [ ! -d .git ]; then
-    PROJECT_GIT="no"
-    echo "You do not have any branch now! A git repository will facilitate you on revision management"
+  PROJECT_GIT="no"
+  echo "You do not have any branch now! A git repository will facilitate you on revision management"
 
 else
-    PROJECT_GIT="yes"
-    HEADP=$(cat .git/HEAD)
-    BRANCH=${HEADP##*/}
-#    BRANCH=$(git status |head -1 | awk '{ print $3 }')
+  PROJECT_GIT="yes"
+  HEADP=$(cat .git/HEAD)
+  BRANCH=${HEADP##*/}
+#  BRANCH=$(git status |head -1 | awk '{ print $3 }')
 #  BRANCH_TRUNC equal later part of the BRANCH, first part before - removed 
-    BRANCH_TRUNC=${BRANCH#*-}
-    echo "BRANCH is ${BRANCH}"
+  BRANCH_TRUNC=${BRANCH#*-}
+  echo "BRANCH is ${BRANCH}"
 fi
 
 
 # Automatically check projects in workspace 
 echo "Try to find out your projects in workspace"
 PLIST=( $(ls -l |grep -E '^d' |awk '{print $9}' |grep -v 'project_shared') )
-#    echo "${PLIST[@]}"
-#    echo ${#PLIST[*]}
 NUM=${#PLIST[@]}
 echo "Please select the hardware platform you are about to publish:"
 for ((i=0;i<$NUM;i++)); do
@@ -149,7 +154,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 #  PLATFORM=$(ls -d ./workspace/${PROJECT}/tmp/deploy/image/*/ 2>/dev/null | head -n 1)
   PLATFORM=$(grep 'MACHINE =' ./workspace/${PROJECT}/conf/local.conf | awk '{print $3}' | sed 's/"//g' )
 
-#prepare display server type, by default DISPLAY_SERVER is xwayland in define in final else
+#prepare display server type and FS type as part of path. by default DISPLAY_SERVER is xwayland in define in final else
   if [[ "${NAND_SOM[@]}"  =~ "${PLATFORM}" ]]; then
     echo "som flash type is nand"
     FS1="ubifs"
@@ -168,35 +173,66 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     
   fi
 
+#pick out special som or som group  that need to define linux kernel and uboot version seperately
 
   if [[ "${PLATFORM}" =~ "6ul" ]] ; then
-     echo "it's 6ul platrom"
-     DISPLAY_SERVER="x11"
-     UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
-     SRC_DTB="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
-     SRC_UBOOT="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
+    echo "it's 6ul platrom"
+    DISPLAY_SERVER="x11"
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0\
+        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+  
+    SRC_DTB="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
+    SRC_UBOOT="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
   elif [[ "${PLATFORM}" =~ "ccmp" ]] ; then
-     echo "it's ST platform"
+    echo "it's ST platform"
+  elif [[ "${PLATFORM}" =~ "imx9" ]] ; then
+    echo "it's cc9 "
+
   else
-     echo "it's wayland platform"
+     echo "common config for connectcore som"
      DISPLAY_SERVER="xwayland"
-     UBOOT_FILE="imx-boot-${PLATFORM}.bin"
+
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_VERSION=2020.04-r0
+
+        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0\
+        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
 
   fi
-
-
 
 else
   echo "please input the number within options.Abort now!"
   exit 1
 fi
 
+
+
 #image type selection
 echo "Please choose the  image type you're about to publish"
 echo "1. core-image-base"
 echo "2. dey-image-webkit"
 echo "3. dey-image-qt"
-echo "4. dey-image-tiny"
+echo "4. dey-image-crank"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
@@ -208,7 +244,7 @@ elif [ "3" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-qt-${DISPLAY_SERVER}"
 elif [ "4" = "$IMAGE_SELECTOR" ]; then
 
-  IMAGE="dey-image-tiny"
+  IMAGE="dey-image-crank-${DISPLAY_SERVER}"
 else
   echo "please input the right choice"
   exit 1
@@ -216,7 +252,7 @@ fi
 
 
 
-# preprare copy to release
+# preprare copy path 
 
 SRC_BASE="${PLATFORM}/tmp/deploy/images/${PLATFORM}"
 if [ "no" = "$PROJECT_GIT" ]; then
