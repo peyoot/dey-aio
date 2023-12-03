@@ -140,7 +140,7 @@ fi
 
 # Automatically check projects in workspace 
 echo "Try to find out your projects in workspace"
-PLIST=( $(ls -l |grep -E '^d' |awk '{print $9}' |grep -v 'project_shared') )
+PLIST=( $(ls -l workspace|grep -E '^d' |awk '{print $9}' |grep -v 'project_shared') )
 NUM=${#PLIST[@]}
 echo "Please select the hardware platform you are about to publish:"
 for ((i=0;i<$NUM;i++)); do
@@ -191,8 +191,8 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
   
-    SRC_DTB="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
-    SRC_UBOOT="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
+    SRC_DTB="workspace/${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
+    SRC_UBOOT="workspace/${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
   elif [[ "${PLATFORM}" =~ "ccmp" ]] ; then
     echo "it's ST platform"
   elif [[ "${PLATFORM}" =~ "imx9" ]] ; then
@@ -254,11 +254,11 @@ fi
 
 # preprare copy path 
 
-SRC_BASE="${PLATFORM}/tmp/deploy/images/${PLATFORM}"
+SRC_BASE="workspace/${PLATFORM}/tmp/deploy/images/${PLATFORM}"
 if [ "no" = "$PROJECT_GIT" ]; then
-  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}"
+  DEST_PATH=" ./release/${PLATFORM}"
 else
-  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}/${BRANCH}"
+  DEST_PATH=" ./release/${PLATFORM}/${BRANCH}"
 fi
 if [ ! -d $DEST_PATH ]; then
   mkdir -p $DEST_PATH
