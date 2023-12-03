@@ -191,8 +191,8 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
   
-    SRC_DTB="workspace/${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
-    SRC_UBOOT="workspace/${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
+    SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
+    SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
   elif [[ "${PLATFORM}" =~ "ccmp" ]] ; then
     echo "it's ST platform"
   elif [[ "${PLATFORM}" =~ "imx9" ]] ; then
@@ -254,11 +254,11 @@ fi
 
 # preprare copy path 
 
-SRC_BASE="workspace/${PLATFORM}/tmp/deploy/images/${PLATFORM}"
+SRC_BASE="workspace/${PROJECT}/tmp/deploy/images/${PLATFORM}"
 if [ "no" = "$PROJECT_GIT" ]; then
-  DEST_PATH=" ./release/${PLATFORM}"
+  DEST_PATH=" ./release/${PROJECT}"
 else
-  DEST_PATH=" ./release/${PLATFORM}/${BRANCH}"
+  DEST_PATH=" ./release/${PROJECT}/${BRANCH}"
 fi
 if [ ! -d $DEST_PATH ]; then
   mkdir -p $DEST_PATH
