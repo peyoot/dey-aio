@@ -110,7 +110,7 @@ exec 3<&1
 
 BRANCH=""
 PROJECT=""
-DEY_VERSION=$(pwd |awk -F '/' '{print $(NF-1)}')
+DEY_VERSION=$(pwd |awk -F '/' '{print $(NF)}')
 NAND_SOM=(
 ccimx6ulsbc
 ccimx6ulstarter
@@ -212,8 +212,8 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     esac
 
   else
-     echo "common config for connectcore som"
-     DISPLAY_SERVER="xwayland"
+    echo "common config for connectcore som"
+    DISPLAY_SERVER="xwayland"
 
     case ${DEY_VERSION} in
       dey3.2)
