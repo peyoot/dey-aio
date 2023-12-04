@@ -165,14 +165,6 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     FS2="ext4.gz"
   fi
 
-  if [[ "${PLATFORM}" =~ "ccmp" ]] ; then
-    echo "MPU type is ST"
-    echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
-  else
-    echo "MPU type is NXP"
-    
-  fi
-
 #pick out special som or som group  that need to define linux kernel and uboot version seperately
 
   if [[ "${PLATFORM}" =~ "6ul" ]] ; then
@@ -181,22 +173,43 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     case ${DEY_VERSION} in
       dey3.2)
         LINUX_KERNEL=5.4-r0.0
-        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
         ;;
       dey4.0)
-        LINUX_KERNEL=5.15-r0.0\
-        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
         ;;
       *)
         echo "wrong path to perform this script"
     esac
-  
-    SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
-    SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
+
   elif [[ "${PLATFORM}" =~ "ccmp" ]] ; then
     echo "it's ST platform"
+    echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
+    case ${DEY_VERSION} in
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
   elif [[ "${PLATFORM}" =~ "imx9" ]] ; then
     echo "it's cc9 "
+
+    case ${DEY_VERSION} in
+      dey4.0)
+        LINUX_KERNEL=6.1-r0.0
+        UBOOT_VERSION=2023.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
 
   else
      echo "common config for connectcore som"
@@ -206,17 +219,16 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
       dey3.2)
         LINUX_KERNEL=5.4-r0.0
         UBOOT_VERSION=2020.04-r0
-
-        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
       dey4.0)
-        LINUX_KERNEL=5.15-r0.0\
-        UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
       *)
         echo "wrong path to perform this script"
     esac
-
 
   fi
 
@@ -225,6 +237,8 @@ else
   exit 1
 fi
 
+SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/arm/boot/dts/"
+SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey/"
 
 
 #image type selection
@@ -282,9 +296,9 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
   fi
 # copy developping dtb
-  if [ "" != "${PROJECT}" ]; then
-    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
-  fi
+#  if [ "" != "${PROJECT}" ]; then
+#    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
+#  fi
 
   echo "major images have been copied to release path"
 
