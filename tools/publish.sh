@@ -244,10 +244,21 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     cp ${SRC_BASE}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
     cp ${SRC_BASE}/boot.scr ${DEST_PATH}/
+
+    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+      echo "copy ST platform bootloader"
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
+    fi
   else
     cp ${SRC_UBOOT}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_UBOOT}/install_linux* ${DEST_PATH}/
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
+    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+      echo "copy ST platform bootloader"
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
+    fi
   fi
 # copy developping dtb
 #  if [ "" != "${PROJECT}" ]; then
