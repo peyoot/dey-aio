@@ -56,53 +56,7 @@ prompt-yesno() {
   done
 }
 
-platform-selector(){
-  if [ "1" =  "$PLATFORM_SELECTOR" ]; then
-    echo "You have choose cc6ul platform to publish"
-#    SOURCE_PATH="cc6ulsbc/tmp/deploy/images/ccimx6ulsbc"
-#        CPU="imx6ul"
-#        SBC="ccimx6ulsbc"
-#        KFS="ubifs"
-#        RFS="ubifs"
-#        XSERVER="x11"
-#        UBOOTPRE="u-boot"
-#        UBOOTEXT="imx"
-  fi
-  if [ "2" = "$PLATFORM_SELECTOR" ]; then
-    SOURCE_PATH="tmp/deploy/images/ccimx8mn-dvk"
-    CPU="imx8mn"
-    SBC="ccimx8mn-dvk"
-    KFS="vfat"
-    RFS="ext4"
-    XSERVER="xwayland"
-    UBOOTPRE="imx-boot"
-    UBOOTEXT="bin"
-  fi
-  if [ "3" = "$PLATFORM_SELECTOR" ]; then
-        SOURCE_PATH="tmp/deploy/images/ccimx8x-sbc-pro"
-        CPU="imx8x"
-        SBC="ccimx8x-sbc-pro"
-        KFS="vfat"
-        RFS="ext4"
-        XSERVER="xwayland"
-        UBOOTPRE="imx-boot"
-        UBOOTEXT="bin"
-  fi
-}
 
-
-# define global variables
-
-#check if parent folder is ready
-#if [ ! -d release/ccimx6ul ]; then
-#    mkdir -p release/ccimx6ul
-#fi
-#if [ ! -d release/ccimx8mnano ]; then
-#    mkdir -p release/ccimx8mnano
-#fi
-#if [ ! -d release/ccimx8x ]; then
-#    mkdir -p release/ccimx8x
-#fi
 
 exec 3<&1
 
@@ -185,13 +139,13 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
 
-  elif [[ "${PLATFORM}" =~ "ccmp" ]] ; then
+  elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
     echo "it's ST platform"
     echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
     case ${DEY_VERSION} in
       dey4.0)
         LINUX_KERNEL=5.15-r0.0
-        UBOOT_VERSION=2020.04-r0
+        UBOOT_VERSION=2021.10-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
       *)
