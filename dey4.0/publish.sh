@@ -1,7 +1,10 @@
 #! /bin/bash
 #This scripts help you pack your release image files to DEY release folder
 #check out https://github.com/peyoot/dey-aio for more informaiton
- 
+#Author: Robin Tu  
+#twitter/X.com  peyoot_tu
+#
+
 if test -z "$BASH_VERSION"; then
   echo "Please run this script using bash, not sh or any other shell." >&2
   exit 1
@@ -53,53 +56,7 @@ prompt-yesno() {
   done
 }
 
-platform-selector(){
-  if [ "1" =  "$PLATFORM_SELECTOR" ]; then
-    echo "You have choose cc6ul platform to publish"
-#    SOURCE_PATH="cc6ulsbc/tmp/deploy/images/ccimx6ulsbc"
-#        CPU="imx6ul"
-#        SBC="ccimx6ulsbc"
-#        KFS="ubifs"
-#        RFS="ubifs"
-#        XSERVER="x11"
-#        UBOOTPRE="u-boot"
-#        UBOOTEXT="imx"
-  fi
-  if [ "2" = "$PLATFORM_SELECTOR" ]; then
-    SOURCE_PATH="tmp/deploy/images/ccimx8mn-dvk"
-    CPU="imx8mn"
-    SBC="ccimx8mn-dvk"
-    KFS="vfat"
-    RFS="ext4"
-    XSERVER="xwayland"
-    UBOOTPRE="imx-boot"
-    UBOOTEXT="bin"
-  fi
-  if [ "3" = "$PLATFORM_SELECTOR" ]; then
-        SOURCE_PATH="tmp/deploy/images/ccimx8x-sbc-pro"
-        CPU="imx8x"
-        SBC="ccimx8x-sbc-pro"
-        KFS="vfat"
-        RFS="ext4"
-        XSERVER="xwayland"
-        UBOOTPRE="imx-boot"
-        UBOOTEXT="bin"
-  fi
-}
 
-
-# define global variables
-
-#check if parent folder is ready
-#if [ ! -d release/ccimx6ul ]; then
-#    mkdir -p release/ccimx6ul
-#fi
-#if [ ! -d release/ccimx8mnano ]; then
-#    mkdir -p release/ccimx8mnano
-#fi
-#if [ ! -d release/ccimx8x ]; then
-#    mkdir -p release/ccimx8x
-#fi
 
 exec 3<&1
 
@@ -107,56 +64,125 @@ exec 3<&1
 
 BRANCH=""
 PROJECT=""
-DEY_VERSION=$(pwd |awk -F '/' '{print $(NF-1)}')
+DEY_VERSION=$(pwd |awk -F '/' '{print $(NF)}')
+NAND_SOM=(
+ccimx6ulsbc
+ccimx6ulstarter
+ccmp13-dvk
+ccmp15-dvk
+)
 echo "dey version is ${DEY_VERSION}"
-#check if any git repository avaialbe in workspace
+
+
+#check if any git repository avaialbe in current dey folder 
+#if you run several projects with same SOM, it's very important to manage them with diferent branches 
+
 if [ ! -d .git ]; then
-    WORKSPACE_GIT="no"
-    echo "Your workspace do not have any branch now! A workspace git repository will facilitate you on revision management"
+  PROJECT_GIT="no"
+  echo "You do not have any branch now! A git repository will facilitate you on revision management"
 
 else
-    WORKSPACE_GIT="yes"
-    HEADP=$(cat .git/HEAD)
-    BRANCH=${HEADP##*/}
-#    BRANCH=$(git status |head -1 | awk '{ print $3 }')
-#    PLATFORM_SHORT=${BRANCH%-*}
-    PROJECT=${BRANCH#*-}
-    echo "project id is ${PROJECT}"
+  PROJECT_GIT="yes"
+  HEADP=$(cat .git/HEAD)
+  BRANCH=${HEADP##*/}
+#  BRANCH=$(git status |head -1 | awk '{ print $3 }')
+#  BRANCH_TRUNC equal later part of the BRANCH, first part before - removed 
+  BRANCH_TRUNC=${BRANCH#*-}
+  echo "BRANCH is ${BRANCH}"
 fi
 
 
 # Automatically check projects in workspace 
 echo "Try to find out your projects in workspace"
-PLIST=( $(ls -l |grep -E '^d'|grep cc | awk '{print $9}') )
-#    echo "${PLIST[@]}"
-#    echo ${#PLIST[*]}
+PLIST=( $(ls -l workspace|grep -E '^d' |awk '{print $9}' |grep -v 'project_shared') )
 NUM=${#PLIST[@]}
 echo "Please select the hardware platform you are about to publish:"
 for ((i=0;i<$NUM;i++)); do
   j=$((i+1))
   echo "${j} ${PLIST[${i}]}"
 done
-PLATFORM_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
-if [ ${PLATFORM_SELECTOR} -le ${NUM} ]; then
-  PLATFORM=${PLIST[((PLATFORM_SELECTOR-1))]}
-  echo "platform in array selected is ${PLATFORM}"
-#prepare display server type
-  if [[ "${PLATFORM}" =~ "6ul" ]] ; then
-     echo "it's 6ul platrom"
-     DISPLAY_SERVER="x11"
-     FS1="ubifs"
-     FS2="ubifs"
-     UBOOT_FILE="u-boot-${PLATFORM}-2020.04-r0.imx"
-     SRC_DTB="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/5.4-r0/build/arch/arm/boot/dts/"
-     SRC_UBOOT="${PLATFORM}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/2020.04-r0/deploy-u-boot-dey/"
-  elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
-     echo "it's mp1 platform"
+PROJECT_SELECTOR=$(prompt-numeric "Which one you are going to publish" "1")
+if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
+  PROJECT=${PLIST[((PROJECT_SELECTOR-1))]}
+  echo "projects in array selected is ${PROJECT}"
+#  PLATFORM=$(ls -d ./workspace/${PROJECT}/tmp/deploy/image/*/ 2>/dev/null | head -n 1)
+  PLATFORM=$(grep 'MACHINE =' ./workspace/${PROJECT}/conf/local.conf | awk '{print $3}' | sed 's/"//g' )
+
+#prepare display server type and FS type as part of path. by default DISPLAY_SERVER is xwayland in define in final else
+  if [[ "${NAND_SOM[@]}"  =~ "${PLATFORM}" ]]; then
+    echo "som flash type is nand"
+    FS1="ubifs"
+    FS2="ubifs"
   else
-     echo "it's wayland platform"
-     DISPLAY_SERVER="xwayland"
-     FS1="vfat"
-     FS2="ext4.gz"
-     UBOOT_FILE="imx-boot-${PLATFORM}.bin"
+    echo "som flash type is emmc"
+    FS1="vfat"
+    FS2="ext4.gz"
+  fi
+
+#pick out special som or som group  that need to define linux kernel and uboot version seperately
+
+  if [[ "${PLATFORM}" =~ "6ul" ]] ; then
+    echo "it's 6ul platrom"
+    DISPLAY_SERVER="x11"
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
+  elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
+    echo "it's ST platform"
+    echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
+    case ${DEY_VERSION} in
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2021.10-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
+  elif [[ "${PLATFORM}" =~ "imx9" ]] ; then
+    echo "it's cc9 "
+
+    case ${DEY_VERSION} in
+      dey4.0)
+        LINUX_KERNEL=6.1-r0.0
+        UBOOT_VERSION=2023.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
+  else
+    echo "common config for connectcore som"
+    DISPLAY_SERVER="xwayland"
+
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
 
   fi
 
@@ -165,18 +191,28 @@ else
   exit 1
 fi
 
+SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/arm/boot/dts/"
+SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey/"
+
+
 #image type selection
 echo "Please choose the  image type you're about to publish"
-echo "1. dey-image-qt"
-echo "2. core-image-base"
-echo "3. dey-image-tiny"
+echo "1. core-image-base"
+echo "2. dey-image-webkit"
+echo "3. dey-image-qt"
+echo "4. dey-image-crank"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
-  IMAGE="dey-image-qt-${DISPLAY_SERVER}"
-elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
+
+elif [ "2" = "$IMAGE_SELECTOR" ]; then
+  IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
+
 elif [ "3" = "$IMAGE_SELECTOR" ]; then
-  IMAGE="dey-image-tiny"
+  IMAGE="dey-image-qt-${DISPLAY_SERVER}"
+elif [ "4" = "$IMAGE_SELECTOR" ]; then
+
+  IMAGE="dey-image-crank-${DISPLAY_SERVER}"
 else
   echo "please input the right choice"
   exit 1
@@ -184,13 +220,13 @@ fi
 
 
 
-# preprare copy to release
+# preprare copy path 
 
-SRC_BASE="${PLATFORM}/tmp/deploy/images/${PLATFORM}"
-if [ "no" = "$WORKSPACE_GIT" ]; then
-  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}"
+SRC_BASE="workspace/${PROJECT}/tmp/deploy/images/${PLATFORM}"
+if [ "no" = "$PROJECT_GIT" ]; then
+  DEST_PATH=" ./release/${PROJECT}"
 else
-  DEST_PATH=" ../../release/${DEY_VERSION}/${PLATFORM}/${BRANCH}"
+  DEST_PATH=" ./release/${PROJECT}/${BRANCH}"
 fi
 if [ ! -d $DEST_PATH ]; then
   mkdir -p $DEST_PATH
@@ -208,15 +244,26 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     cp ${SRC_BASE}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
     cp ${SRC_BASE}/boot.scr ${DEST_PATH}/
+
+    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+      echo "copy ST platform bootloader"
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
+    fi
   else
     cp ${SRC_UBOOT}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_UBOOT}/install_linux* ${DEST_PATH}/
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
+    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+      echo "copy ST platform bootloader"
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
+    fi
   fi
 # copy developping dtb
-  if [ "" != "${PROJECT}" ]; then
-    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
-  fi
+#  if [ "" != "${PROJECT}" ]; then
+#    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
+#  fi
 
   echo "major images have been copied to release path"
 
