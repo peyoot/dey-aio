@@ -91,6 +91,8 @@ else
   echo "BRANCH is ${BRANCH}"
 fi
 
+DISPLAY_SERVER="xwayland"
+
 
 # Automatically check projects in workspace 
 echo "Try to find out your projects in workspace"
@@ -167,7 +169,6 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 
   else
     echo "common config for connectcore som"
-    DISPLAY_SERVER="xwayland"
 
     case ${DEY_VERSION} in
       dey3.2)
