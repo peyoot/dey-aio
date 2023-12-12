@@ -281,6 +281,11 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
       cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
     fi
   fi
+
+  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
+    gzip -d ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz
+  fi
+
 # copy developping dtb
 #  if [ "" != "${PROJECT}" ]; then
 #    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
