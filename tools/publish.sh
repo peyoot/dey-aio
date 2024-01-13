@@ -65,6 +65,8 @@ exec 3<&1
 BRANCH=""
 PROJECT=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF)}')
+DISPLAY_SERVER="xwayland"
+
 NAND_SOM=(
 ccimx6ulsbc
 ccimx6ulstarter
@@ -91,7 +93,6 @@ else
   echo "BRANCH is ${BRANCH}"
 fi
 
-DISPLAY_SERVER="xwayland"
 
 
 # Automatically check projects in workspace 
@@ -143,8 +144,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 
 
   elif [[ "${PLATFORM}" =~ "imx8" ]] ; then
-    echo "it's 6ul platrom"
-    DISPLAY_SERVER="x11"
+    echo "it's cc8 platrom"
     case ${DEY_VERSION} in
       dey3.2)
         LINUX_KERNEL=5.4-r0.0
@@ -225,6 +225,7 @@ echo "4. dey-image-crank"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
+  DISPLAY_SERVER="xwayland"
 
 elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
