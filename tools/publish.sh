@@ -65,6 +65,8 @@ exec 3<&1
 BRANCH=""
 PROJECT=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF)}')
+DISPLAY_SERVER="xwayland"
+
 NAND_SOM=(
 ccimx6ulsbc
 ccimx6ulstarter
@@ -90,6 +92,7 @@ else
   BRANCH_TRUNC=${BRANCH#*-}
   echo "BRANCH is ${BRANCH}"
 fi
+
 
 
 # Automatically check projects in workspace 
@@ -139,6 +142,25 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
 
+
+  elif [[ "${PLATFORM}" =~ "imx8" ]] ; then
+    echo "it's cc8 platrom"
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}.imx"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}.imx"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
+
   elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
     echo "it's ST platform"
     echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
@@ -159,7 +181,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
       dey4.0)
         LINUX_KERNEL=6.1-r0.0
         UBOOT_VERSION=2023.04-r0
-        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        UBOOT_FILE="imx-boot-${PLATFORM}.bin"
         ;;
       *)
         echo "wrong path to perform this script"
@@ -167,7 +189,6 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 
   else
     echo "common config for connectcore som"
-    DISPLAY_SERVER="xwayland"
 
     case ${DEY_VERSION} in
       dey3.2)
@@ -204,6 +225,7 @@ echo "4. dey-image-crank"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
+  DISPLAY_SERVER="xwayland"
 
 elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
@@ -260,6 +282,11 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
       cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
     fi
   fi
+
+  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
+    gzip -d ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz
+  fi
+
 # copy developping dtb
 #  if [ "" != "${PROJECT}" ]; then
 #    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
