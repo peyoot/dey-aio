@@ -163,6 +163,8 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 
   elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
     echo "it's ST platform"
+    DISPLAY_SERVER="wayland"
+
     echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
     case ${DEY_VERSION} in
       dey4.0)
