@@ -299,7 +299,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
   if prompt-yesno "Do you want to pack images to create an installer zip file?" yes; then
     sync
     sleep 2
-    zip -j ${DEST_PATH}/my_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/my_sd_installer.zip
+    zip -j ${DEST_PATH}/${PROJECT}_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/${PROJECT}_sd_installer.zip
   fi
 else
   echo "you've chosen not to copy images to release folder! Make sure release folder already have the latest one. "
