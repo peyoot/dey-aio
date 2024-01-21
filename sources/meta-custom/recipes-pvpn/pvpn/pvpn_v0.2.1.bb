@@ -26,5 +26,5 @@ do_install:append() {
   install -d ${D}/usr/local/bin
   install -m 0644 ${WORKDIR}/stunnel.service ${D}/${systemd_unitdir}/system/
   install -m 0644 ${WORKDIR}/openvpn-client@.service ${D}/${systemd_unitdir}/system/
-  install -m 0644 ${WORKDIR}/${PN}-${PV}install_vpn.sh ${D}/usr/local/bin/
+  install -m 0644 ${WORKDIR}/${PN}-${PV}/install_vpn.sh ${D}/usr/local/bin/
 }
