@@ -3,8 +3,8 @@ DESCRIPTION = "adding pvpn service file to systemd"
 FILEEXTRAPATHS:prepend := "${THISDIR}/files:"
 PROVIDERS:{PN} += "{PN}"
 PVPN_GIT_URI = "https://github.com/peyoot/pvpn/archive/refs/tags/${PV}.zip;protocol=https"
-PVPN_GIT_URI[md5sum] = "112233445566"
-PVPN_GIT_URI[sha256sum] = "665544332211"
+SRC_URI[sha256sum] = "4d1b67b6b10c00d6bd2109f1892ddb0a372c5ffc505e40f119f4001570f7c292"
+
 
 LICENSE = "CLOSED"
 inherit systemd
