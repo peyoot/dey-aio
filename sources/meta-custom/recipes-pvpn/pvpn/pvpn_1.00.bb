@@ -9,7 +9,7 @@ inherit systemd
 SYSTEMD_AUTO_ENABLE = "disable"
 SYSTEMD_SERVICE_${PN} = "stunnel.service openvpn-client@.service"
 
-SRC_URI_append = " file://stunnel.service \
+SRC_URI:append = " file://stunnel.service \
                    file://openvpn-client@.service"
 FILES:${PN} += "${systemd_unitdir}/system/stunnel.service \
                 ${systemd_unitdir}/system/openvpn-client@.service"
