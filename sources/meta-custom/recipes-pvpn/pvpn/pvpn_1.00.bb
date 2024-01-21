@@ -14,7 +14,7 @@ SRC_URI:append = " file://stunnel.service \
 FILES:${PN} += "${systemd_unitdir}/system/stunnel.service \
                 ${systemd_unitdir}/system/openvpn-client@.service"
 
-do_install_append() {
+do_install:append() {
   install -d ${D}/${systemd_unitdir}/system
   install -m 0644 ${WORKDIR}/stunnel.service ${D}/${systemd_unitdir}/system/
   install -m 0644 ${WORKDIR}/openvpn-client@.service ${D}/${systemd_unitdir}/system/
