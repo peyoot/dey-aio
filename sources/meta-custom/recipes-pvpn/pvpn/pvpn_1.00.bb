@@ -14,7 +14,7 @@ SYSTEMD_SERVICE_${PN} = "stunnel.service openvpn-client@.service"
 
 
 SRC_URI:append = " \
-                   PVPN_GIT_URI \
+                   ${PVPN_GIT_URI} \
                    file://stunnel.service \
                    file://openvpn-client@.service"
 FILES:${PN} += "${systemd_unitdir}/system/stunnel.service \
@@ -26,5 +26,5 @@ do_install:append() {
   install -d ${D}/usr/local/bin
   install -m 0644 ${WORKDIR}/stunnel.service ${D}/${systemd_unitdir}/system/
   install -m 0644 ${WORKDIR}/openvpn-client@.service ${D}/${systemd_unitdir}/system/
-  install -m 0644 ${S}/install_vpn.sh ${D}/usr/local/bin/
+  install -m 0644 ${WORKDIR}/${PN}-${PV}install_vpn.sh ${D}/usr/local/bin/
 }
