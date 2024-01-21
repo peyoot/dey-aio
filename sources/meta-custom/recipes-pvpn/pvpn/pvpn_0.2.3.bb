@@ -2,7 +2,7 @@ SUMMARY = "pvpn daemon"
 DESCRIPTION = "adding pvpn service file to systemd"
 FILEEXTRAPATHS:prepend := "${THISDIR}/files:"
 PROVIDERS:{PN} += "{PN}"
-RDEPENDS = "bash"
+RDEPENDS:{PN} = "bash"
 
 PVPN_GIT_URI = "https://github.com/peyoot/pvpn/archive/refs/tags/${PV}.zip;protocol=https"
 SRC_URI[sha256sum] = "edfcf40ca1e4125e22b2100b4b80ccbd090c23b3cba4db873ba523fbab1df8ef"
