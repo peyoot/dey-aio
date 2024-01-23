@@ -143,22 +143,42 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     esac
 
 
-  elif [[ "${PLATFORM}" =~ "imx8" ]] ; then
+  elif [[ "${PLATFORM}" =~ "imx8m" ]] ; then
     echo "it's cc8 platrom"
     case ${DEY_VERSION} in
       dey3.2)
         LINUX_KERNEL=5.4-r0.0
         UBOOT_VERSION=2020.04-r0
-        UBOOT_FILE="imx-boot-${PLATFORM}.imx"
+        UBOOT_FILE="imx-boot-${PLATFORM}.bin"
         ;;
       dey4.0)
         LINUX_KERNEL=5.15-r0.0
         UBOOT_VERSION=2020.04-r0
-        UBOOT_FILE="imx-boot-${PLATFORM}.imx"
+        UBOOT_FILE="imx-boot-${PLATFORM}.bin"
         ;;
       *)
         echo "wrong path to perform this script"
     esac
+
+
+
+  elif [[ "${PLATFORM}" =~ "imx8x" ]] ; then
+    echo "it's cc8 platrom"
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
 
 
   elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
