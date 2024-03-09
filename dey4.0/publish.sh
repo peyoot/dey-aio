@@ -201,18 +201,19 @@ echo "1. core-image-base"
 echo "2. dey-image-webkit"
 echo "3. dey-image-qt"
 echo "4. dey-image-crank"
+echo "5. dey-image-lvgl"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
 
 elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
-
 elif [ "3" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-qt-${DISPLAY_SERVER}"
 elif [ "4" = "$IMAGE_SELECTOR" ]; then
-
   IMAGE="dey-image-crank-${DISPLAY_SERVER}"
+elif [ "5" = "$IMAGE_SELECTOR" ]; then
+  IMAGE="dey-image-lvgl-${DISPLAY_SERVER}"
 else
   echo "please input the right choice"
   exit 1
