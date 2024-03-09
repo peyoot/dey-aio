@@ -16,44 +16,31 @@ v2.0  可以使用容器化的docker环境，也可以使用标准的开发方�
 7. 可以选择发布到本地 TFTP 服务器文件夹或 scp 到远程服务器进行共享。
 等等...
 ## 2.  目录结构
-dey-aio
+dey-aio 主分支
 ```
 /
 ├── dey4.0                      DEY version
 │   ├──docker-compose.yml
 │   ├──mkproject.sh
+│   ├── publish.sh
 │   ├── sources
 │        ├── meta-custom
-│   ├── tools
-│        ├── publish.sh
 │   ├── workspace
+│   ├── release                 released folders (when you use publishing tools)
 ├── dey3.2                      DEY version
 │   ├──docker-compose.yml
 │   ├──mkproject.sh
+│   ├── publish.sh
 │   ├── sources
 │        ├── meta-custom
-│   ├── tools
-│        ├── publish.sh
 │   ├── workspace
-| ...
-├── release                    released folders (when you use publishing tools)
-│   ├── dey4.0                   
-│        ├── cc6ul
-│        ├── ccmp15
-│        ├── cc8mn
-│        ├── cc8mm
-│        ├── cc8x
-│        ├── cc93
-│        ├── ...
-│   ├── dey3.2                   
-│        ├── ...
-│   └ ...
+│   ├── release                 released folders (when you use publishing tools)
 |
 ├── README.md
 └── README-cn.md
 
 ```
-最新版本采用repo的工具来管理源码树，请参考：https://github.com/peyoot/dey-aio-manifest/blob/main/README-cn.md
+dey-aio的其它分支是配合dey-aio-manifest来使用的。最新版本采用repo的工具来管理源码树，请参考：https://github.com/peyoot/dey-aio-manifest/blob/main/README-cn.md
 
 如果您只使用docker的方式来开发，相关参考如下：
 

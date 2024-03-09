@@ -17,42 +17,30 @@ Now dey-aio also support DEY native way as well as docker way to develop project
 8. Can also choose to publish to local TFTP server folder or scp to remote server for share.
    and more ...
 ## 2.  Software Architecture
-dey-aio
+dey-aio main branch
 ```
 /
 ├── dey4.0                      DEY version
 │   ├──docker-compose.yml
 │   ├──mkproject.sh
+│   ├── publish.sh
 │   ├── sources
 │        ├── meta-custom
-│   ├── tools
-│        ├── publish.sh
 │   ├── workspace
+│   ├── release                 released folders (when you use publishing tools)
 ├── dey3.2                      DEY version
 │   ├──docker-compose.yml
 │   ├──mkproject.sh
+│   ├── publish.sh
 │   ├── sources
 │        ├── meta-custom
-│   ├── tools
-│        ├── publish.sh
 │   ├── workspace
-| ...
-├── release                    released folders (when you use publishing tools)
-│   ├── dey4.0                   
-│        ├── cc6ul
-│        ├── ccmp15
-│        ├── cc8mn
-│        ├── cc8mm
-│        ├── cc8x
-│        ├── cc93
-│        ├── ...
-│   ├── dey3.2                   
-│        ├── ...
-│   └ ...
+│   ├── release                 released folders (when you use publishing tools)
 |
 ├── README.md
 └── README-cn.md
 ```
+dey-aio other branches are a part of dey-aio-manifest. More details please go to dey-aio-manifest.
 ## 3. Usage
 Latest version use repo tool to manage the source code tree. Please also refer to https://github.com/peyoot/dey-aio-manifest
 
