@@ -203,7 +203,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
       dey4.0)
         LINUX_KERNEL=6.1-r0.0
         UBOOT_VERSION=2023.04-r0
-        UBOOT_FILE="imx-boot-${PLATFORM}.bin"
+        UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
         ;;
       *)
         echo "wrong path to perform this script"
