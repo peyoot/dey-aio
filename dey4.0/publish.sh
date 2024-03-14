@@ -152,6 +152,41 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
 
+
+  elif [[ "${PLATFORM}" =~ "imx8m" ]] ; then
+    echo "it's cc8 platrom"
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}.bin"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
+  elif [[ "${PLATFORM}" =~ "imx8x" ]] ; then
+    echo "it's cc8 platrom"
+    case ${DEY_VERSION} in
+      dey3.2)
+        LINUX_KERNEL=5.4-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
+        ;;
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2020.04-r0
+        UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
   elif [[ "${PLATFORM}" =~ "imx9" ]] ; then
     echo "it's cc9 "
 
@@ -159,7 +194,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
       dey4.0)
         LINUX_KERNEL=6.1-r0.0
         UBOOT_VERSION=2023.04-r0
-        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}*.bin"
         ;;
       *)
         echo "wrong path to perform this script"
