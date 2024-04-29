@@ -282,8 +282,8 @@ echo "You are about to copy the ${PLATFORM} ${DEY_VERSION} images to release fol
 if prompt-yesno "Scripts will copy major images to release folder, continue?" yes; then
 # copy from images folder
   cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.recovery.${FS1} ${DEST_PATH}/
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.${FS2} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.recovery.${FS1} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.${FS2} ${DEST_PATH}/
   if prompt-yesno "copy uboot/dtb/scripts files from tmp/deploy/images?" yes; then
     cp ${SRC_BASE}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
@@ -305,9 +305,11 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     fi
   fi
 
-  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
-    gzip -d ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz
-  fi
+  find "${DEST_PATH}" -type f -name '${IMAGE}*-${PLATFORM}.ext4.gz' -print0 | xargs -0 gzip -d
+
+#  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
+#    gzip -d ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz
+#  fi
 
 # copy developping dtb
 #  if [ "" != "${PROJECT}" ]; then
