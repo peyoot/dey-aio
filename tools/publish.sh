@@ -268,9 +268,9 @@ fi
 
 SRC_BASE="workspace/${PROJECT}/tmp/deploy/images/${PLATFORM}"
 if [ "no" = "$PROJECT_GIT" ]; then
-  DEST_PATH=" ./release/${PROJECT}"
+  DEST_PATH="./release/${PROJECT}"
 else
-  DEST_PATH=" ./release/${PROJECT}/${BRANCH}"
+  DEST_PATH="./release/${PROJECT}/${BRANCH}"
 fi
 if [ ! -d $DEST_PATH ]; then
   mkdir -p $DEST_PATH
@@ -305,7 +305,10 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     fi
   fi
 
-  find "${DEST_PATH}" -type f -name '${IMAGE}*-${PLATFORM}.ext4.gz' -print0 | xargs -0 gzip -d
+  find "${DEST_PATH}" -type f -name "${IMAGE}*-${PLATFORM}.ext4.gz" -print -exec gzip -d {} +
+
+#  find "${DEST_PATH}" -type f -name '${IMAGE}*-${PLATFORM}.ext4.gz' -print0 | xargs -0 gzip -d
+
 
 #  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
 #    gzip -d ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz
