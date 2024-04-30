@@ -339,7 +339,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
       find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
 #    zip -j ${DEST_PATH}/${PROJECT}_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/${PROJECT}_sd_installer.zip
     else
-      find "${DEST_PATH}" -type f \( -name "${IMAGE}*" -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' ! -name 'dey-image-qtros*' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+      find "${DEST_PATH}" -type f \( -name "${IMAGE}*" -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' ! -name 'dey-image-qtros*' ! -name '*humble*' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
     fi
   fi
 else
