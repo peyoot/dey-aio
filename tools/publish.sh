@@ -310,11 +310,11 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
 
 #  find "${DEST_PATH}" -type f -name '${IMAGE}*-${PLATFORM}.ext4.gz' -print0 | xargs -0 gzip -d
 
-  echo "DEY AIO support ROS2 and we publish ros2 image as well. We'll need to change ros2 image name by this scripts to enable installer with ros2 support"
   if prompt-yesno "Is this a ros2 project?" no; then
-    echo "change ros image name to dey-image-qtros"
+    echo "DEY AIO support ROS2 and we can publish ros2 image as well."
+    echo "now change ros image name to dey-image-qtros"
     ISROS="yes"
-    find "${DEST_PATH}" -type f -name "*qt-xwayland-humble*" -exec bash -c 'mv "$0" "${0/qt-xwayland-humble/qtros-xwayland}"' {} \;
+    find "${DEST_PATH}" -type f -name "*qt-xwayland-humble*" -exec bash -c 'mv "$0" "${0/qt-xwayland-humble/qtros}"' {} \;
   else
     echo "use normal dey images for packing"
     ISROS="no"
