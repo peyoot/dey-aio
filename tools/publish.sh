@@ -282,7 +282,7 @@ fi
 echo "You are about to copy the ${PLATFORM} ${DEY_VERSION} images to release folde. Image type:${IMAGE} workspace git branch:${BRANCH}"
 if prompt-yesno "Scripts will copy major images to release folder, continue?" yes; then
 # copy from images folder
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
   cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.recovery.${FS1} ${DEST_PATH}/
   cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.${FS2} ${DEST_PATH}/
   if prompt-yesno "copy uboot/dtb/scripts files from tmp/deploy/images?" yes; then
@@ -312,13 +312,13 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
 
   echo "DEY AIO support ROS2 and we publish ros2 image as well. We'll need to change ros2 image name by this scripts to enable installer with ros2 support"
   if prompt-yesno "Is this a ros2 project?" no; then
-    echo "it is a normal dey project"
-    ISROS="no"
-  else
-    echo "change to ros image"
+    echo "change ros image name to dey-image-qtros"
     ISROS="yes"
-#    find . -type f -name "*-humble*" -exec bash -c 'mv "$0" "${0/-humble/ros}"' {} \;
     find "${DEST_PATH}" -type f -name "*qt-xwayland-humble*" -exec bash -c 'mv "$0" "${0/qt-xwayland-humble/qtros-xwayland}"' {} \;
+  else
+    echo "use normal dey images for packing"
+    ISROS="no"
+#    find . -type f -name "*-humble*" -exec bash -c 'mv "$0" "${0/-humble/ros}"' {} \;
   fi
 
 #  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
@@ -339,7 +339,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
       find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
 #    zip -j ${DEST_PATH}/${PROJECT}_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/${PROJECT}_sd_installer.zip
     else
-      find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+      find "${DEST_PATH}" -type f \( -name '${IMAGE}*' -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' ! -name 'dey-image-qtros*' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
     fi
   fi
 else
