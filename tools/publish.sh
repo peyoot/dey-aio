@@ -66,6 +66,7 @@ BRANCH=""
 PROJECT=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF)}')
 DISPLAY_SERVER="xwayland"
+ISROS="no"
 
 NAND_SOM=(
 ccimx6ulsbc
@@ -309,6 +310,16 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
 
 #  find "${DEST_PATH}" -type f -name '${IMAGE}*-${PLATFORM}.ext4.gz' -print0 | xargs -0 gzip -d
 
+  echo "DEY AIO support ROS2 and we publish ros2 image as well. We'll need to change ros2 image name by this scripts to enable installer with ros2 support"
+  if prompt-yesno "Is this a ros2 project?" no; then
+    echo "it is a normal dey project"
+    ISROS="no"
+  else
+    echo "change to ros image"
+    ISROS="yes"
+#    find . -type f -name "*-humble*" -exec bash -c 'mv "$0" "${0/-humble/ros}"' {} \;
+    find "${DEST_PATH}" -type f -name "*qt-xwayland-humble*" -exec bash -c 'mv "$0" "${0/qt-xwayland-humble/qtros-xwayland}"' {} \;
+  fi
 
 #  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
 #    gzip -d ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz
@@ -324,7 +335,12 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
   if prompt-yesno "Do you want to pack images to create an installer zip file?" yes; then
     sync
     sleep 2
-    zip -j ${DEST_PATH}/${PROJECT}_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/${PROJECT}_sd_installer.zip
+    if [[ "ISROS" == "yes" ]]; then
+      find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+#    zip -j ${DEST_PATH}/${PROJECT}_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/${PROJECT}_sd_installer.zip
+    else
+      find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+    fi
   fi
 else
   echo "you've chosen not to copy images to release folder! Make sure release folder already have the latest one. "
