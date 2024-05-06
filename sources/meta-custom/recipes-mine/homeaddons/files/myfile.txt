@@ -1,1 +1,0 @@
-It's a test file to be put on rootfs
