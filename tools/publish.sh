@@ -349,16 +349,17 @@ fi
 
 if prompt-yesno "Would you like to publish the releases to the web/tftp server?" "no"; then
     echo "Please choose where you'd like publish:"
-    echo "1. Publish to TFTP folder"
+    echo "1. Publish to TFTP/NFS folder"
     echo "2. Publish to dey-mirror"
     echo "3. Publish to your own server"
     PUBLISH=$(prompt-numeric "Please choose where you'd like to publish releases" "1")
     if [ "1" = "$PUBLISH" ]; then
-       TFTP_PATH=$(prompt "Please input the path of tftp folder:" "${DEST_PATH}/tftpboot")
+       TFTP_PATH=$(prompt "Please input the path:" "${DEST_PATH}/tftpboot")
        mkdir -p ${TFTP_PATH}
-       echo "copying the release to the giving tftp folder"
+       echo "copying the release to the giving path"
        cp ${DEST_PATH}/${IMAGE}* ${TFTP_PATH}/
-       cp ${DEST_PATH}/u-boot* ${TFTP_PATH}/
+       cp ${DEST_PATH}/*-boot* ${TFTP_PATH}/
+       cp ${DEST_PATH}/boot.scr ${TFTP_PATH}/
     elif [ "2" = "$PUBLISH" ]; then
        echo "copying the release to dey-mirror"
        USERNAME=$(prompt "Please input the username of dey-mirror server" "")
@@ -375,7 +376,7 @@ if prompt-yesno "Would you like to publish the releases to the web/tftp server?"
        SERVER_IP=$(prompt "Please input the server IP address" "")
        USERNAME=$(prompt "Please input the username of the erver" "")
        SERVER_PATH=$(prompt "Please input path on the server where you want to store the published installer" "")
-       scp ${DEST_PATH}/my_sd_installer.zip ${USERNAME}@${SERVER_IP}:${SERVER_PATH}
+       scp ${DEST_PATH}/*installer.zip ${USERNAME}@${SERVER_IP}:${SERVER_PATH}
     else
        echo "Please input the right choice"
        exit 1
