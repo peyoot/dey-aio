@@ -281,7 +281,7 @@ fi
 
 # review information before publish
 
-echo "Here is the information summary upon your choice. Platform is ${PLATFORM} and DEY version is ${DEY_VERSION}. Image type:${IMAGE} workspace git branch:${BRANCH}"
+echo "Here is the summary upon your choice. Platform: ${PLATFORM}; DEY version: ${DEY_VERSION}; Image type: ${IMAGE}; Workspace git branch:${BRANCH}"
 if prompt-yesno "Scripts will copy major images to release folder, continue?" yes; then
 # copy from images folder
   cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
