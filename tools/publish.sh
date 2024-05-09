@@ -346,6 +346,13 @@ else
   echo "you've chosen not to copy images to release folder! Make sure release folder already have the latest one. "
   echo "publishing to web/tftp will base on the images and zip files that are in release folder"
 fi
+if [[ -d "${SRC_BASE}/sdk" ]]; then
+  if prompt-yesno "Copy SDK to release?" no; then
+    cp -r ${SRC_BASE}/sdk ${DEST_PATH}/
+  else
+    echo "SDK won't copy out to release folder"
+  fi
+fi
 
 if prompt-yesno "Would you like to publish the releases to the web/tftp server?" "no"; then
     echo "Please choose where you'd like publish:"
