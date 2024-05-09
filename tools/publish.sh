@@ -1,7 +1,7 @@
 #! /bin/bash
 #This scripts help you pack your release image files to DEY release folder
 #check out https://github.com/peyoot/dey-aio for more informaiton
-#Author: Robin Tu  
+#Author: Robin Tu
 #twitter/X.com  peyoot_tu
 #
 
@@ -10,7 +10,7 @@ if test -z "$BASH_VERSION"; then
   exit 1
 fi
 
-_() { 
+_() {
 set -euo pipefail
 # Declare an array so that we can capture the original arguments.
 declare -a ORIGINAL_ARGS
@@ -268,6 +268,8 @@ fi
 # preprare copy path 
 
 SRC_BASE="workspace/${PROJECT}/tmp/deploy/images/${PLATFORM}"
+SRC_SDK="workspace/${PROJECT}/tmp/deploy/sdk"
+
 if [ "no" = "$PROJECT_GIT" ]; then
   DEST_PATH="./release/${PROJECT}"
 else
@@ -279,7 +281,7 @@ fi
 
 # review information before publish
 
-echo "You are about to copy the ${PLATFORM} ${DEY_VERSION} images to release folde. Image type:${IMAGE} workspace git branch:${BRANCH}"
+echo "Here is the information summary upon your choice. Platform is ${PLATFORM} and DEY version is ${DEY_VERSION}. Image type:${IMAGE} workspace git branch:${BRANCH}"
 if prompt-yesno "Scripts will copy major images to release folder, continue?" yes; then
 # copy from images folder
   cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
@@ -346,9 +348,10 @@ else
   echo "you've chosen not to copy images to release folder! Make sure release folder already have the latest one. "
   echo "publishing to web/tftp will base on the images and zip files that are in release folder"
 fi
-if [[ -d "${SRC_BASE}/sdk" ]]; then
+
+if [[ -d "${SRC_SDK}" ]]; then
   if prompt-yesno "Copy SDK to release?" no; then
-    cp -r ${SRC_BASE}/sdk ${DEST_PATH}/
+    cp -r ${SRC_SDK} ${DEST_PATH}/
   else
     echo "SDK won't copy out to release folder"
   fi
