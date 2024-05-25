@@ -74,6 +74,23 @@ ccimx6ulstarter
 ccmp13-dvk
 ccmp15-dvk
 )
+
+if prompt-yesno "check and install some prerequisite packages?" no; then
+  PACKAGE_UPDATE="apt -qq update"
+  PACKAGE_INSTALL_BASE="apt -qq -y install "
+  eval ${PACKAGE_UPDATE}
+  additional_packages=("curl" "sshpass" "zip" "rsync")
+  for pack_str in ${additional_packages[@]}; do
+    if [ ! -e /usr/bin/${pack_str} ]; then
+      PACKAGE_INSTALL=${PACKAGE_INSTALL_BASE}${pack_str}
+      eval ${PACKAGE_INSTALL}
+    fi
+  done
+else
+  echo "Ignore to check prerequisite packages. Please remember to install missing packages first if any error happens"
+fi
+
+
 echo "dey version is ${DEY_VERSION}"
 
 
@@ -358,38 +375,38 @@ if [[ -d "${SRC_SDK}" ]]; then
 fi
 
 if prompt-yesno "Would you like to publish the releases to the web/tftp server?" "no"; then
-    echo "Please choose where you'd like publish:"
-    echo "1. Publish to TFTP/NFS folder"
-    echo "2. Publish to dey-mirror"
-    echo "3. Publish to your own server"
-    PUBLISH=$(prompt-numeric "Please choose where you'd like to publish releases" "1")
-    if [ "1" = "$PUBLISH" ]; then
-       TFTP_PATH=$(prompt "Please input the path:" "${DEST_PATH}/tftpboot")
-       mkdir -p ${TFTP_PATH}
-       echo "copying the release to the giving path"
-       cp ${DEST_PATH}/${IMAGE}* ${TFTP_PATH}/
-       cp ${DEST_PATH}/*-boot* ${TFTP_PATH}/
-       cp ${DEST_PATH}/boot.scr ${TFTP_PATH}/
-    elif [ "2" = "$PUBLISH" ]; then
-       echo "copying the release to dey-mirror"
-       USERNAME=$(prompt "Please input the username of dey-mirror server" "")
-       SERVER_IP=
-       if [ "robin" = "${USERNAME}" ]; then
-         echo "you'll need to input correct password to authenticate yourself"
-         rsync -avzP ${DEST_PATH}/*.zip '-e ssh -p 10022' robin@101.231.59.68:/home/robin/docker/dnmp/www/dey-mirror/dey-images/release
-       else
-         echo "You don't have the right to access eccee server"
-         exit 1
-       fi
-    elif [ "3" = "$PUBLISH" ]; then
-       echo "copying the release installer to your own server by scp command"
-       SERVER_IP=$(prompt "Please input the server IP address" "")
-       USERNAME=$(prompt "Please input the username of the erver" "")
-       SERVER_PATH=$(prompt "Please input path on the server where you want to store the published installer" "")
-       scp ${DEST_PATH}/*installer.zip ${USERNAME}@${SERVER_IP}:${SERVER_PATH}
+    echo "It can be a local path or remote one. Scripts will help you rsync the released stuff. "
+    echo "A valid path should like: "
+    echo "/home/mypath,10.10.1.10:/home/mypath or user@192.168.1.10:/home/mypath"
+    PUBLISH_PATH=$(prompt "Please input the path:" "${DEST_PATH}/tftpboot")
+
+    if [[ $PUBLISH_PATH =~ ^/ ]]; then
+        echo "sync to local path：$PUBLISH_PATH"
+        rsync -av --progress "$DEST_PATH" "$PUBLISH_PATH/"
+    # judge if it's a remote path
+    elif [[ $PUBLISH_PATH =~ ^[a-zA-Z0-9]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]] || [[$PUBLISH_PATH =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]]; then
+        # get user name and host
+        if [[ $PUBLISH_PATH =~ ^[a-zA-Z0-9]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]]; then
+            user=$(echo "$PUBLISH_PATH" | cut -d '@' -f 1)
+            host=$(echo "$PUBLISH_PATH" | cut -d '@' -f 2 | cut -d ':' -f 1)
+        else
+            # use local user if no user in the remote path 
+            user=$(whoami)
+            host=$(echo "$PUBLISH_PATH" | cut -d ':' -f 1)
+            echo "no user specified in the remote path. use local user: $user"
+        fi
+
+        # prompt password input 
+        read -sp "Please input password of the user to access remote server （or press enter in no password or use ssh key）： " password
+
+        if [[ -n "$password" ]]; then
+            sshpass -p "$password" rsync -avz --progress -e "ssh" "$DEST_PATH" "$PUBLISH_PATH"
+        else
+            rsync -avz --progress -e "ssh" "$DEST_PATH" "$PUBLISH_PATH"
+        fi
     else
-       echo "Please input the right choice"
-       exit 1
+        echo "invalid path！"
+        exit 1
     fi
 fi
 
