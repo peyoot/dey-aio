@@ -384,7 +384,7 @@ if prompt-yesno "Would you like to publish the releases to the web/tftp server?"
         echo "sync to local path：$PUBLISH_PATH"
         rsync -av --progress "$DEST_PATH" "$PUBLISH_PATH/"
     # judge if it's a remote path
-    elif [[ $PUBLISH_PATH =~ ^[a-zA-Z0-9]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]] || [[$PUBLISH_PATH =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]]; then
+    elif [[ $PUBLISH_PATH =~ ^[a-zA-Z0-9]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]] || [[ $PUBLISH_PATH =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]]; then
         # get user name and host
         if [[ $PUBLISH_PATH =~ ^[a-zA-Z0-9]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]]; then
             user=$(echo "$PUBLISH_PATH" | cut -d '@' -f 1)
