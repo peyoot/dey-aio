@@ -334,6 +334,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     echo "now change ros image name to dey-image-qtros"
     ISROS="yes"
     find "${DEST_PATH}" -type f -name "*qt-xwayland-humble*" -exec bash -c 'mv "$0" "${0/qt-xwayland-humble/qtros}"' {} \;
+    find "${DEST_PATH}" -type f -name "*qt-wayland-humble*" -exec bash -c 'mv "$0" "${0/qt-wayland-humble/qtros}"' {} \;
   else
     echo "use normal dey images for packing"
     ISROS="no"
