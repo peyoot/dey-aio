@@ -311,7 +311,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
 
     if [[ "${PLATFORM}" =~ "mp1" ]] ; then
       echo "copy ST platform bootloader"
-      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
       cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
     fi
   else
@@ -320,7 +320,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
     if [[ "${PLATFORM}" =~ "mp1" ]] ; then
       echo "copy ST platform bootloader"
-      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
       cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
     fi
   fi
