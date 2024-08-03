@@ -76,8 +76,13 @@ ccmp15-dvk
 )
 
 if prompt-yesno "check and install some prerequisite packages?" no; then
-  PACKAGE_UPDATE="apt -qq update"
-  PACKAGE_INSTALL_BASE="apt -qq -y install "
+  if [ "$(id -u)" -eq 0 ]; then
+    PACKAGE_UPDATE="apt -qq update"
+    PACKAGE_INSTALL_BASE="apt -qq -y install "
+  else
+    PACKAGE_UPDATE="sudo apt -qq update"
+    PACKAGE_INSTALL_BASE="sudo apt -qq -y install "
+  fi
   eval ${PACKAGE_UPDATE}
   additional_packages=("curl" "sshpass" "zip" "rsync")
   for pack_str in ${additional_packages[@]}; do
@@ -86,6 +91,7 @@ if prompt-yesno "check and install some prerequisite packages?" no; then
       eval ${PACKAGE_INSTALL}
     fi
   done
+  echo "Now all prerequisite packages installed. "
 else
   echo "Ignore to check prerequisite packages. Please remember to install missing packages first if any error happens"
 fi
