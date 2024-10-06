@@ -273,8 +273,6 @@ echo "6. manually input an image name"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
-  DISPLAY_SERVER="xwayland"
-
 elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
 elif [ "3" = "$IMAGE_SELECTOR" ]; then
