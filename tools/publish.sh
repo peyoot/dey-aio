@@ -269,11 +269,10 @@ echo "2. dey-image-webkit"
 echo "3. dey-image-qt"
 echo "4. dey-image-crank"
 echo "5. dey-image-lvgl"
+echo "6. manually input an image name"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
-  DISPLAY_SERVER="xwayland"
-
 elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
 elif [ "3" = "$IMAGE_SELECTOR" ]; then
@@ -282,6 +281,8 @@ elif [ "4" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-crank-${DISPLAY_SERVER}"
 elif [ "5" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-lvgl-${DISPLAY_SERVER}"
+elif [ "6" = "$IMAGE_SELECTOR" ]; then
+  IMAGE=$(prompt "Please input an image name:" "core-image-mono")
 else
   echo "please input the right choice"
   exit 1
