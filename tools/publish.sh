@@ -203,7 +203,20 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
 
+  elif [[ "${PLATFORM}" =~ "mp2" ]] ; then
+    echo "it's ST platform"
+    DISPLAY_SERVER="wayland"
 
+    echo "need to copy  tf-a-${PLATFORM}-*.stm32 and fip-${PLATFORM}-optee.bin later"
+    case ${DEY_VERSION} in
+      dey4.0)
+        LINUX_KERNEL=6.1-r0.0
+        UBOOT_VERSION=2022.10-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
 
   elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
     echo "it's ST platform"
@@ -316,7 +329,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
     cp ${SRC_BASE}/boot.scr ${DEST_PATH}/
 
-    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+    if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
       cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
       cp ${SRC_BASE}/fip-${PLATFORM}-*.bin ${DEST_PATH}/
@@ -325,7 +338,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     cp ${SRC_UBOOT}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_UBOOT}/install_linux* ${DEST_PATH}/
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
-    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+    if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
       cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
       cp ${SRC_BASE}/fip-${PLATFORM}-*.bin ${DEST_PATH}/
