@@ -1,7 +1,7 @@
 #! /bin/bash
 #This scripts help you pack your release image files to DEY release folder
 #check out https://github.com/peyoot/dey-aio for more informaiton
-#Author: Robin Tu  
+#Author: Robin Tu
 #twitter/X.com  peyoot_tu
 #
 
@@ -10,7 +10,7 @@ if test -z "$BASH_VERSION"; then
   exit 1
 fi
 
-_() { 
+_() {
 set -euo pipefail
 # Declare an array so that we can capture the original arguments.
 declare -a ORIGINAL_ARGS
@@ -65,12 +65,48 @@ exec 3<&1
 BRANCH=""
 PROJECT=""
 DEY_VERSION=$(pwd |awk -F '/' '{print $(NF)}')
+DISPLAY_SERVER="xwayland"
+ISROS="no"
+
 NAND_SOM=(
 ccimx6ulsbc
 ccimx6ulstarter
 ccmp13-dvk
 ccmp15-dvk
 )
+
+ARM64_SOM=(
+ccimx8mm-dvk
+ccimx8mn-dvk
+ccimx8x-sbc-express
+ccimx8x-sbc-pro
+ccimx91-dvk
+ccimx93-dvk
+ccmp25-dvk
+)
+
+if prompt-yesno "check and install some prerequisite packages?" no; then
+  if [ "$(id -u)" -eq 0 ]; then
+    PACKAGE_UPDATE="apt -qq update"
+    PACKAGE_INSTALL_BASE="apt -qq -y install "
+  else
+    PACKAGE_UPDATE="sudo apt -qq update"
+    PACKAGE_INSTALL_BASE="sudo apt -qq -y install "
+  fi
+  eval ${PACKAGE_UPDATE}
+  additional_packages=("curl" "sshpass" "zip" "rsync")
+  for pack_str in ${additional_packages[@]}; do
+    if [ ! -e /usr/bin/${pack_str} ]; then
+      PACKAGE_INSTALL=${PACKAGE_INSTALL_BASE}${pack_str}
+      eval ${PACKAGE_INSTALL}
+    fi
+  done
+  echo "Now all prerequisite packages installed. "
+else
+  echo "Ignore to check prerequisite packages. Please remember to install missing packages first if any error happens"
+fi
+
+
 echo "dey version is ${DEY_VERSION}"
 
 
@@ -90,6 +126,7 @@ else
   BRANCH_TRUNC=${BRANCH#*-}
   echo "BRANCH is ${BRANCH}"
 fi
+
 
 
 # Automatically check projects in workspace 
@@ -119,6 +156,14 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     FS2="ext4.gz"
   fi
 
+  if [[ "${ARM64_SOM[@]}"  =~ "${PLATFORM}" ]]; then
+    echo "som arch type is arm64"
+    SOM_ARCH="arm64"
+  else
+    echo "som arch type is arm"
+    SOM_ARCH="arm"
+  fi
+
 #pick out special som or som group  that need to define linux kernel and uboot version seperately
 
   if [[ "${PLATFORM}" =~ "6ul" ]] ; then
@@ -134,19 +179,6 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         LINUX_KERNEL=5.15-r0.0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
-        ;;
-      *)
-        echo "wrong path to perform this script"
-    esac
-
-  elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
-    echo "it's ST platform"
-    echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
-    case ${DEY_VERSION} in
-      dey4.0)
-        LINUX_KERNEL=5.15-r0.0
-        UBOOT_VERSION=2021.10-r0
-        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
       *)
         echo "wrong path to perform this script"
@@ -170,6 +202,8 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
 
+
+
   elif [[ "${PLATFORM}" =~ "imx8x" ]] ; then
     echo "it's cc8 platrom"
     case ${DEY_VERSION} in
@@ -187,6 +221,36 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         echo "wrong path to perform this script"
     esac
 
+  elif [[ "${PLATFORM}" =~ "mp2" ]] ; then
+    echo "it's ST platform"
+    DISPLAY_SERVER="wayland"
+
+    echo "need to copy  tf-a-${PLATFORM}-*.stm32 and fip-${PLATFORM}-optee.bin later"
+    case ${DEY_VERSION} in
+      dey4.0)
+        LINUX_KERNEL=6.1-r0.0
+        UBOOT_VERSION=2022.10-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
+  elif [[ "${PLATFORM}" =~ "mp1" ]] ; then
+    echo "it's ST platform"
+    DISPLAY_SERVER="wayland"
+
+    echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
+    case ${DEY_VERSION} in
+      dey4.0)
+        LINUX_KERNEL=5.15-r0.0
+        UBOOT_VERSION=2021.10-r0
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      *)
+        echo "wrong path to perform this script"
+    esac
+
   elif [[ "${PLATFORM}" =~ "imx9" ]] ; then
     echo "it's cc9 "
 
@@ -194,7 +258,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
       dey4.0)
         LINUX_KERNEL=6.1-r0.0
         UBOOT_VERSION=2023.04-r0
-        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}*.bin"
+        UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
         ;;
       *)
         echo "wrong path to perform this script"
@@ -202,7 +266,6 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 
   else
     echo "common config for connectcore som"
-    DISPLAY_SERVER="xwayland"
 
     case ${DEY_VERSION} in
       dey3.2)
@@ -226,7 +289,7 @@ else
   exit 1
 fi
 
-SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/arm/boot/dts/"
+SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/${SOM_ARCH}/boot/dts/digi/"
 SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey/"
 
 
@@ -237,10 +300,10 @@ echo "2. dey-image-webkit"
 echo "3. dey-image-qt"
 echo "4. dey-image-crank"
 echo "5. dey-image-lvgl"
+echo "6. manually input an image name"
 IMAGE_SELECTOR=$(prompt-numeric "which kind of image you're going to publish" "1")
 if [ "1" = "$IMAGE_SELECTOR" ]; then
   IMAGE="core-image-base"
-
 elif [ "2" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-webkit-${DISPLAY_SERVER}"
 elif [ "3" = "$IMAGE_SELECTOR" ]; then
@@ -249,20 +312,23 @@ elif [ "4" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-crank-${DISPLAY_SERVER}"
 elif [ "5" = "$IMAGE_SELECTOR" ]; then
   IMAGE="dey-image-lvgl-${DISPLAY_SERVER}"
+elif [ "6" = "$IMAGE_SELECTOR" ]; then
+  IMAGE=$(prompt "Please input an image name:" "core-image-mono")
 else
   echo "please input the right choice"
   exit 1
 fi
 
 
-
 # preprare copy path 
 
 SRC_BASE="workspace/${PROJECT}/tmp/deploy/images/${PLATFORM}"
+SRC_SDK="workspace/${PROJECT}/tmp/deploy/sdk"
+
 if [ "no" = "$PROJECT_GIT" ]; then
-  DEST_PATH=" ./release/${PROJECT}"
+  DEST_PATH="./release/${PROJECT}"
 else
-  DEST_PATH=" ./release/${PROJECT}/${BRANCH}"
+  DEST_PATH="./release/${PROJECT}/${BRANCH}"
 fi
 if [ ! -d $DEST_PATH ]; then
   mkdir -p $DEST_PATH
@@ -270,32 +336,53 @@ fi
 
 # review information before publish
 
-echo "You are about to copy the ${PLATFORM} ${DEY_VERSION} images to release folde. Image type:${IMAGE} workspace git branch:${BRANCH}"
+echo "Here is the summary upon your choice. Platform: ${PLATFORM}; DEY version: ${DEY_VERSION}; Image type: ${IMAGE}; Workspace git branch:${BRANCH}"
 if prompt-yesno "Scripts will copy major images to release folder, continue?" yes; then
 # copy from images folder
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.recovery.${FS1} ${DEST_PATH}/
-  cp ${SRC_BASE}/${IMAGE}-${PLATFORM}.${FS2} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.boot.${FS1} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.recovery.${FS1} ${DEST_PATH}/
+  cp ${SRC_BASE}/${IMAGE}*-${PLATFORM}.${FS2} ${DEST_PATH}/
   if prompt-yesno "copy uboot/dtb/scripts files from tmp/deploy/images?" yes; then
     cp ${SRC_BASE}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
     cp ${SRC_BASE}/boot.scr ${DEST_PATH}/
 
-    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+    if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
-      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
-      cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/fip-${PLATFORM}-*.bin ${DEST_PATH}/
     fi
   else
     cp ${SRC_UBOOT}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_UBOOT}/install_linux* ${DEST_PATH}/
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
-    if [[ "${PLATFORM}" =~ "mp1" ]] ; then
+    if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
-      cp ${SRC_BASE}/tf-a-${PLATFORM}-nand.stm32 ${DEST_PATH}/
-      cp ${SRC_BASE}/fip-${PLATFORM}-optee.bin ${DEST_PATH}/
+      cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/fip-${PLATFORM}-*.bin ${DEST_PATH}/
     fi
   fi
+
+  find "${DEST_PATH}" -type f -name "${IMAGE}*-${PLATFORM}.ext4.gz" -print -exec gzip -d {} +
+
+#  find "${DEST_PATH}" -type f -name '${IMAGE}*-${PLATFORM}.ext4.gz' -print0 | xargs -0 gzip -d
+
+  if prompt-yesno "Is this a ros2 project?" no; then
+    echo "DEY AIO support ROS2 and we can publish ros2 image as well."
+    echo "now change ros image name to dey-image-qtros"
+    ISROS="yes"
+    find "${DEST_PATH}" -type f -name "*qt-xwayland-humble*" -exec bash -c 'mv "$0" "${0/qt-xwayland-humble/qtros}"' {} \;
+    find "${DEST_PATH}" -type f -name "*qt-wayland-humble*" -exec bash -c 'mv "$0" "${0/qt-wayland-humble/qtros}"' {} \;
+  else
+    echo "use normal dey images for packing"
+    ISROS="no"
+#    find . -type f -name "*-humble*" -exec bash -c 'mv "$0" "${0/-humble/ros}"' {} \;
+  fi
+
+#  if [ -e ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz ]; then
+#    gzip -d ${DEST_PATH}/${IMAGE}-${PLATFORM}.ext4.gz
+#  fi
+
 # copy developping dtb
 #  if [ "" != "${PROJECT}" ]; then
 #    cp ${SRC_DTB}/imx6ul-${PLATFORM}-${PROJECT}*.dtb* ${DEST_PATH}/
@@ -306,45 +393,59 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
   if prompt-yesno "Do you want to pack images to create an installer zip file?" yes; then
     sync
     sleep 2
-    zip -j ${DEST_PATH}/my_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/my_sd_installer.zip
+    if [[ "${ISROS}" == "yes" ]]; then
+      find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'tf*' -o -name 'fip*' -o -name 'u-boot*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+#    zip -j ${DEST_PATH}/${PROJECT}_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/${PROJECT}_sd_installer.zip
+    else
+      find "${DEST_PATH}" -type f \( -name "${IMAGE}*" -o -name 'install_*' -o -name 'imx*' -o -name 'tf*' -o -name 'fip*' -o -name 'u-boot*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' ! -name 'dey-image-qtros*' ! -name '*humble*' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+    fi
   fi
 else
   echo "you've chosen not to copy images to release folder! Make sure release folder already have the latest one. "
   echo "publishing to web/tftp will base on the images and zip files that are in release folder"
 fi
 
+if [[ -d "${SRC_SDK}" ]]; then
+  if prompt-yesno "Copy SDK to release?" no; then
+    cp -r ${SRC_SDK} ${DEST_PATH}/
+  else
+    echo "SDK won't copy out to release folder"
+  fi
+fi
+
 if prompt-yesno "Would you like to publish the releases to the web/tftp server?" "no"; then
-    echo "Please choose where you'd like publish:"
-    echo "1. Publish to TFTP folder"
-    echo "2. Publish to dey-mirror"
-    echo "3. Publish to your own server"
-    PUBLISH=$(prompt-numeric "Please choose where you'd like to publish releases" "1")
-    if [ "1" = "$PUBLISH" ]; then
-       TFTP_PATH=$(prompt "Please input the path of tftp folder:" "${DEST_PATH}/tftpboot")
-       mkdir -p ${TFTP_PATH}
-       echo "copying the release to the giving tftp folder"
-       cp ${DEST_PATH}/${IMAGE}* ${TFTP_PATH}/
-       cp ${DEST_PATH}/u-boot* ${TFTP_PATH}/
-    elif [ "2" = "$PUBLISH" ]; then
-       echo "copying the release to dey-mirror"
-       USERNAME=$(prompt "Please input the username of dey-mirror server" "")
-       SERVER_IP=
-       if [ "robin" = "${USERNAME}" ]; then
-         echo "you'll need to input correct password to authenticate yourself"
-         rsync -avzP ${DEST_PATH}/*.zip '-e ssh -p 10022' robin@101.231.59.68:/home/robin/docker/dnmp/www/dey-mirror/dey-images/release
-       else
-         echo "You don't have the right to access eccee server"
-         exit 1
-       fi
-    elif [ "3" = "$PUBLISH" ]; then
-       echo "copying the release installer to your own server by scp command"
-       SERVER_IP=$(prompt "Please input the server IP address" "")
-       USERNAME=$(prompt "Please input the username of the erver" "")
-       SERVER_PATH=$(prompt "Please input path on the server where you want to store the published installer" "")
-       scp ${DEST_PATH}/my_sd_installer.zip ${USERNAME}@${SERVER_IP}:${SERVER_PATH}
+    echo "It can be a local path or remote one. Scripts will help you rsync the released stuff. "
+    echo "A valid path should like: "
+    echo "/home/mypath,10.10.1.10:/home/mypath or user@192.168.1.10:/home/mypath"
+    PUBLISH_PATH=$(prompt "Please input the path:" "${DEST_PATH}/tftpboot")
+
+    if [[ $PUBLISH_PATH =~ ^/ ]]; then
+        echo "sync to local path：$PUBLISH_PATH"
+        rsync -av --progress "$DEST_PATH" "$PUBLISH_PATH/"
+    # judge if it's a remote path
+    elif [[ $PUBLISH_PATH =~ ^[a-zA-Z0-9]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]] || [[ $PUBLISH_PATH =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]]; then
+        # get user name and host
+        if [[ $PUBLISH_PATH =~ ^[a-zA-Z0-9]+@[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:/ ]]; then
+            user=$(echo "$PUBLISH_PATH" | cut -d '@' -f 1)
+            host=$(echo "$PUBLISH_PATH" | cut -d '@' -f 2 | cut -d ':' -f 1)
+        else
+            # use local user if no user in the remote path 
+            user=$(whoami)
+            host=$(echo "$PUBLISH_PATH" | cut -d ':' -f 1)
+            echo "no user specified in the remote path. use local user: $user"
+        fi
+
+        # prompt password input 
+        read -sp "Please input password of the user to access remote server （or press enter in no password or use ssh key）： " password
+
+        if [[ -n "$password" ]]; then
+            sshpass -p "$password" rsync -avz --progress -e "ssh" "$DEST_PATH" "$PUBLISH_PATH"
+        else
+            rsync -avz --progress -e "ssh" "$DEST_PATH" "$PUBLISH_PATH"
+        fi
     else
-       echo "Please input the right choice"
-       exit 1
+        echo "invalid path！"
+        exit 1
     fi
 fi
 
