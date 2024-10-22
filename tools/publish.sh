@@ -144,7 +144,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
   echo "projects in array selected is ${PROJECT}"
 #  PLATFORM=$(ls -d ./workspace/${PROJECT}/tmp/deploy/image/*/ 2>/dev/null | head -n 1)
   PLATFORM=$(grep 'MACHINE =' ./workspace/${PROJECT}/conf/local.conf | awk '{print $3}' | sed 's/"//g' )
-
+  PLATFORM_ = PLATFORM.replace('-', '_')
 #prepare display server type and FS type as part of path. by default DISPLAY_SERVER is xwayland in define in final else
   if [[ "${NAND_SOM[@]}"  =~ "${PLATFORM}" ]]; then
     echo "som flash type is nand"
@@ -289,8 +289,8 @@ else
   exit 1
 fi
 
-SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/${SOM_ARCH}/boot/dts/digi/"
-SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey/"
+SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM_}-dey-linux/linux-dey/${LINUX_KERNEL}/build/arch/${SOM_ARCH}/boot/dts/digi/"
+SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM_}-dey-linux/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey/"
 
 
 #image type selection
