@@ -353,9 +353,13 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
       cp ${SRC_BASE}/fip-${PLATFORM}-*.bin ${DEST_PATH}/
     fi
   else
+    if [ ! -d ${DEST_PATH}/dtb ]; then
+      mkdir -p ${DEST_PATH}/dtb
+    fi
     cp ${SRC_UBOOT}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_UBOOT}/install_linux* ${DEST_PATH}/
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
+    cp ${SRC_DTB} ${DEST_PATH}/dtb/
     if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
       cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
