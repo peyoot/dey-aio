@@ -75,6 +75,16 @@ ccmp13-dvk
 ccmp15-dvk
 )
 
+ARM64_SOM=(
+ccimx8mm-dvk
+ccimx8mn-dvk
+ccimx8x-sbc-express
+ccimx8x-sbc-pro
+ccimx91-dvk
+ccimx93-dvk
+ccmp25-dvk
+)
+
 if prompt-yesno "check and install some prerequisite packages?" no; then
   if [ "$(id -u)" -eq 0 ]; then
     PACKAGE_UPDATE="apt -qq update"
@@ -144,6 +154,14 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     echo "som flash type is emmc"
     FS1="vfat"
     FS2="ext4.gz"
+  fi
+
+  if [[ "${ARM64_SOM[@]}"  =~ "${PLATFORM}" ]]; then
+    echo "som arch type is arm64"
+    SOM_ARCH="arm64"
+  else
+    echo "som arch type is arm"
+    SOM_ARCH="arm"
   fi
 
 #pick out special som or som group  that need to define linux kernel and uboot version seperately
@@ -271,7 +289,7 @@ else
   exit 1
 fi
 
-SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/arm/boot/dts/"
+SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/${SOM_ARCH}/boot/dts/digi/"
 SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey/"
 
 
