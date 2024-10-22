@@ -144,7 +144,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
   echo "projects in array selected is ${PROJECT}"
 #  PLATFORM=$(ls -d ./workspace/${PROJECT}/tmp/deploy/image/*/ 2>/dev/null | head -n 1)
   PLATFORM=$(grep 'MACHINE =' ./workspace/${PROJECT}/conf/local.conf | awk '{print $3}' | sed 's/"//g' )
-
+  PLATFORM_=$(echo ${PLATFORM} | tr '-' '_')
 #prepare display server type and FS type as part of path. by default DISPLAY_SERVER is xwayland in define in final else
   if [[ "${NAND_SOM[@]}"  =~ "${PLATFORM}" ]]; then
     echo "som flash type is nand"
@@ -171,12 +171,12 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     DISPLAY_SERVER="x11"
     case ${DEY_VERSION} in
       dey3.2)
-        LINUX_KERNEL=5.4-r0.0
+        LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
         ;;
       dey4.0)
-        LINUX_KERNEL=5.15-r0.0
+        LINUX_KERNEL=5.15-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
         ;;
@@ -189,12 +189,12 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     echo "it's cc8 platrom"
     case ${DEY_VERSION} in
       dey3.2)
-        LINUX_KERNEL=5.4-r0.0
+        LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}.bin"
         ;;
       dey4.0)
-        LINUX_KERNEL=5.15-r0.0
+        LINUX_KERNEL=5.15-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}.bin"
         ;;
@@ -208,12 +208,12 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     echo "it's cc8 platrom"
     case ${DEY_VERSION} in
       dey3.2)
-        LINUX_KERNEL=5.4-r0.0
+        LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
         ;;
       dey4.0)
-        LINUX_KERNEL=5.15-r0.0
+        LINUX_KERNEL=5.15-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
         ;;
@@ -228,7 +228,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     echo "need to copy  tf-a-${PLATFORM}-*.stm32 and fip-${PLATFORM}-optee.bin later"
     case ${DEY_VERSION} in
       dey4.0)
-        LINUX_KERNEL=6.1-r0.0
+        LINUX_KERNEL=6.1-r0
         UBOOT_VERSION=2022.10-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
@@ -243,7 +243,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     echo "need to copy  tf-a-${PLATFORM}-nand.stm32 and fip-${PLATFORM}-optee.bin later"
     case ${DEY_VERSION} in
       dey4.0)
-        LINUX_KERNEL=5.15-r0.0
+        LINUX_KERNEL=5.15-r0
         UBOOT_VERSION=2021.10-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
@@ -256,7 +256,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 
     case ${DEY_VERSION} in
       dey4.0)
-        LINUX_KERNEL=6.1-r0.0
+        LINUX_KERNEL=6.1-r0
         UBOOT_VERSION=2023.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
         ;;
@@ -269,12 +269,12 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
 
     case ${DEY_VERSION} in
       dey3.2)
-        LINUX_KERNEL=5.4-r0.0
+        LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
       dey4.0)
-        LINUX_KERNEL=5.15-r0.0
+        LINUX_KERNEL=5.15-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
         ;;
@@ -289,8 +289,8 @@ else
   exit 1
 fi
 
-SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/linux-dey/${LINUX_KERNEL}/build/arch/${SOM_ARCH}/boot/dts/digi/"
-SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM}-dey-linux-gnueabi/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey/"
+SRC_DTB="workspace/${PROJECT}/tmp/work/${PLATFORM_}-dey-linux/linux-dey/${LINUX_KERNEL}/build/arch/${SOM_ARCH}/boot/dts/digi"
+SRC_UBOOT="workspace/${PROJECT}/tmp/work/${PLATFORM_}-dey-linux/u-boot-dey/${UBOOT_VERSION}/deploy-u-boot-dey"
 
 
 #image type selection
@@ -353,9 +353,13 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
       cp ${SRC_BASE}/fip-${PLATFORM}-*.bin ${DEST_PATH}/
     fi
   else
+    if [ ! -d ${DEST_PATH}/dtb ]; then
+      mkdir -p ${DEST_PATH}/dtb
+    fi
     cp ${SRC_UBOOT}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_UBOOT}/install_linux* ${DEST_PATH}/
     cp ${SRC_UBOOT}/boot.scr ${DEST_PATH}/
+    cp ${SRC_DTB}/* ${DEST_PATH}/dtb/
     if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
       cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
