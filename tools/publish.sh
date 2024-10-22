@@ -144,7 +144,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
   echo "projects in array selected is ${PROJECT}"
 #  PLATFORM=$(ls -d ./workspace/${PROJECT}/tmp/deploy/image/*/ 2>/dev/null | head -n 1)
   PLATFORM=$(grep 'MACHINE =' ./workspace/${PROJECT}/conf/local.conf | awk '{print $3}' | sed 's/"//g' )
-  PLATFORM_ = PLATFORM.replace('-', '_')
+  PLATFORM_=$(echo ${PLATFORM} | tr '-' '_')
 #prepare display server type and FS type as part of path. by default DISPLAY_SERVER is xwayland in define in final else
   if [[ "${NAND_SOM[@]}"  =~ "${PLATFORM}" ]]; then
     echo "som flash type is nand"
