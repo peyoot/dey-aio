@@ -350,6 +350,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
       cp ${SRC_BASE}/tf-a-${PLATFORM}-*.stm32 ${DEST_PATH}/
+      cp ${SRC_BASE}/metadata-${PLATFORM}*.bin ${DEST_PATH}/
       cp ${SRC_BASE}/fip-${PLATFORM}-*.bin ${DEST_PATH}/
     fi
   else
