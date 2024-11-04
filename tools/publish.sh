@@ -346,6 +346,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     cp ${SRC_BASE}/${UBOOT_FILE} ${DEST_PATH}/
     cp ${SRC_BASE}/install_linux* ${DEST_PATH}/
     cp ${SRC_BASE}/boot.scr ${DEST_PATH}/
+    cp ${SRC_BASE}/*.dtb ${DEST_PATH}/
 
     if [[ "${PLATFORM}" =~ "mp" ]] ; then
       echo "copy ST platform bootloader"
