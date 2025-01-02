@@ -170,7 +170,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     echo "it's 6ul platrom"
     DISPLAY_SERVER="x11"
     case ${DEY_VERSION} in
-      dey3.2)
+      dey3.0)
         LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
@@ -188,7 +188,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
   elif [[ "${PLATFORM}" =~ "imx8m" ]] ; then
     echo "it's cc8 platrom"
     case ${DEY_VERSION} in
-      dey3.2)
+      dey3.0)
         LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}.bin"
@@ -207,7 +207,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
   elif [[ "${PLATFORM}" =~ "imx8x" ]] ; then
     echo "it's cc8 platrom"
     case ${DEY_VERSION} in
-      dey3.2)
+      dey3.0)
         LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
@@ -268,7 +268,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
     echo "common config for connectcore som"
 
     case ${DEY_VERSION} in
-      dey3.2)
+      dey3.0)
         LINUX_KERNEL=5.4-r0
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
