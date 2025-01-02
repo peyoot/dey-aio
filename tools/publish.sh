@@ -153,7 +153,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
   else
     echo "som flash type is emmc"
     FS1="vfat"
-    FS2="ext4.gz"
+    FS2="ext4"
   fi
 
   if [[ "${ARM64_SOM[@]}"  =~ "${PLATFORM}" ]]; then
@@ -368,7 +368,7 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     fi
   fi
 
-  find "${DEST_PATH}" -type f -name "${IMAGE}*-${PLATFORM}.ext4.gz" -print -exec gzip -d {} +
+#  find "${DEST_PATH}" -type f -name "${IMAGE}*-${PLATFORM}.ext4.gz" -print -exec gzip -d {} +
 
 #  find "${DEST_PATH}" -type f -name '${IMAGE}*-${PLATFORM}.ext4.gz' -print0 | xargs -0 gzip -d
 
