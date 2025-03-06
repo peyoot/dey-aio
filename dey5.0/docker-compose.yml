@@ -1,0 +1,23 @@
+version: '3'
+services:
+  dey5.0:
+    restart: always
+    user: dey
+    image: peyoot/dey:dey-5.0-r2
+    container_name: dey5.0
+#    ports:
+#      - "21:21"
+#    environment:
+#      - DEY-MIRROR_URL=dey-mirror.eccee.com
+#      - DEY-MIRROR_PORT=1080
+    volumes:
+      - ./workspace:/home/dey/workspace:rw
+      - ./sources/meta-custom:/usr/local/dey-5.0/sources/meta-custom:rw
+      - ./mkproject.sh:/usr/local/dey-5.0/mkproject.sh:ro
+    entrypoint:
+#      - bash
+      - /home/dey/docker-entrypoint.sh
+networks:
+  default:
+#    external:
+#      name: pvpn
