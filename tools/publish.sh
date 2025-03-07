@@ -240,7 +240,7 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
       dey5.0)
         LINUX_KERNEL=6.6
         UBOOT_VERSION=2023.10
-        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}*.bin"
         ;;
       *)
         echo "wrong path to perform this script"
