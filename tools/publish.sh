@@ -180,6 +180,11 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         UBOOT_VERSION=2020.04-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
         ;;
+      dey5.0)
+        LINUX_KERNEL=6.6
+        UBOOT_VERSION=2023.10
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.imx"
+        ;;
       *)
         echo "wrong path to perform this script"
     esac
@@ -231,6 +236,11 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         LINUX_KERNEL=6.1-r0
         UBOOT_VERSION=2022.10-r0
         UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}.bin"
+        ;;
+      dey5.0)
+        LINUX_KERNEL=6.6
+        UBOOT_VERSION=2023.10
+        UBOOT_FILE="u-boot-${PLATFORM}-${UBOOT_VERSION}*.bin"
         ;;
       *)
         echo "wrong path to perform this script"
