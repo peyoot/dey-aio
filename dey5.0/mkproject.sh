@@ -3,7 +3,7 @@
 #
 #  mkproject.sh
 #
-#  Copyright (C) 2013-2022 by Digi International Inc.
+#  Copyright (C) 2013-2024 by Digi International Inc.
 #  All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify it
@@ -25,10 +25,10 @@ MKP_GREEN="\033[1;32m"
 MKP_NONE="\033[0m"
 
 # Path to platform config files
-MKP_CONFIGPATH="${MKP_SCRIPTPATH}/sources/meta-digi/sdk/config"
+MKP_CONFIGPATH="${MKP_SCRIPTPATH}/sources/meta-digi/meta-digi-arm/conf/templates"
 
 # Blacklist platforms (not officially supported in a DEY release)
-MKP_BLACKLIST_PLATFORMS=""
+MKP_BLACKLIST_PLATFORMS="ccimx6qpsbc ccimx6sbc ccimx8mm-dvk ccimx8mn-dvk ccimx8x-sbc-express ccmp13-dvk ccmp15-dvk"
 
 MKP_SETUP_ENVIRONMENT='#!/bin/bash
 
@@ -94,7 +94,9 @@ do_license() {
 		${MKP_SCRIPTPATH}/sources/meta-digi/meta-digi-arm/DIGI_EULA \
 		${MKP_SCRIPTPATH}/sources/meta-digi/meta-digi-arm/DIGI_OPEN_EULA \
 	"
-	if [ "${MKP_PLATFORM}" = "ccmp15-dvk" ] || [ "${MKP_PLATFORM}" = "ccmp13-dvk" ]; then
+	if [ "${MKP_PLATFORM}" = "ccmp15-dvk" ] || \
+	   [ "${MKP_PLATFORM}" = "ccmp13-dvk" ] || \
+	   [ "${MKP_PLATFORM}" = "ccmp25-dvk" ]; then
 		local SOC_VENDOR="STM"
 		MKP_LICENSE_FILES=" \
 			${MKP_LICENSE_FILES} \
@@ -181,12 +183,12 @@ while getopts "lp:m:" c; do
 	case "${c}" in
 		l) MKP_LIST_PLATFORMS="y";;
 		p) MKP_PLATFORM="${OPTARG}";;
-		m) MKP_CONFIGPATH="${MKP_SCRIPTPATH}/sources/${OPTARG}/sdk/config";;
+		m) MKP_CONFIGPATH="${MKP_SCRIPTPATH}/sources/${OPTARG}/meta-digi-arm/conf/templates";;
 	esac
 done
 
 ## Get available platforms
-MKP_AVAILABLE_PLATFORMS="$(echo $(ls -1 ${MKP_CONFIGPATH}/*/local.conf.sample | sed -e 's,^.*config/\([^/]\+\)/local\.conf\.sample,\1,g'))"
+MKP_AVAILABLE_PLATFORMS="$(echo $(ls -1 ${MKP_CONFIGPATH}/*/local.conf.sample | sed -e 's,^.*templates/\([^/]\+\)/local\.conf\.sample,\1,g'))"
 
 ## Sanity checks
 if [ "${BASH_SOURCE}" = "${0}" ]; then
