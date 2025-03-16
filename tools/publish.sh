@@ -270,6 +270,11 @@ if [ ${PROJECT_SELECTOR} -le ${NUM} ]; then
         UBOOT_VERSION=2023.04-r0
         UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
         ;;
+      dey5.0)
+        LINUX_KERNEL=6.6
+        UBOOT_VERSION=2024.04
+        UBOOT_FILE="imx-boot-${PLATFORM}*.bin"
+        ;;
       *)
         echo "wrong path to perform this script"
     esac
@@ -409,10 +414,10 @@ if prompt-yesno "Scripts will copy major images to release folder, continue?" ye
     sync
     sleep 2
     if [[ "${ISROS}" == "yes" ]]; then
-      find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'meta*' -o -name 'tf*' -o -name 'fip*' -o -name 'u-boot*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+      find "${DEST_PATH}" -type f \( -name 'dey-image-qtros*' -o -name 'install_*' -o -name 'imx*' -o -name 'meta*' -o -name 'tf*' -o -name 'fip*' -o -name 'u-boot*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' \) -exec zip -j "${DEST_PATH}/${PROJECT}_installer.zip" {} +
 #    zip -j ${DEST_PATH}/${PROJECT}_sd_installer.zip ${DEST_PATH}/* -x ${DEST_PATH}/${PROJECT}_sd_installer.zip
     else
-      find "${DEST_PATH}" -type f \( -name "${IMAGE}*" -o -name 'install_*' -o -name 'imx*' -o -name 'meta*' -o -name 'tf*' -o -name 'fip*' -o -name 'u-boot*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' ! -name 'dey-image-qtros*' ! -name '*humble*' \) -exec zip -j "${DEST_PATH}/${PROJECT}_sd_installer.zip" {} +
+      find "${DEST_PATH}" -type f \( -name "${IMAGE}*" -o -name 'install_*' -o -name 'imx*' -o -name 'meta*' -o -name 'tf*' -o -name 'fip*' -o -name 'u-boot*' -o -name 'boot.scr' \) -a \( ! -name '*.zip' ! -name 'dey-image-qtros*' ! -name '*humble*' \) -exec zip -j "${DEST_PATH}/${PROJECT}_installer.zip" {} +
     fi
   fi
 else
